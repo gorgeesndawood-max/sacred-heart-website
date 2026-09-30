@@ -36,4 +36,14 @@ const { m, lang } = Astro.props;
   .mc-when { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9rem; color: var(--muted); }
   .mc-when :global(svg) { color: var(--gold); margin-top: 4px; flex: none; }
   .link-arrow { margin-top: auto; color: var(--burgundy); }
+  @media (max-width: 600px) {
+    .mcard { flex-direction: row; align-items: stretch; }
+    .mc-img { aspect-ratio: auto; width: 112px; flex: none; }
+    .mc-img.contain { padding: 12px; }
+    .mc-body { padding: 14px 16px; }
+    h3 { font-size: 1.25rem; margin: 2px 0 4px; }
+    p { font-size: 0.92rem; margin-bottom: 6px; line-height: 1.45; }
+    .mc-when { display: none; }
+    .link-arrow { font-size: 0.92rem; }
+  }
 </style>

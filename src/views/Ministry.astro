@@ -104,6 +104,13 @@ const signup = href(routes.contact, lang) + `?interest=${m.slug}#signup`;
   .muted { color: var(--muted); font-size: 0.9rem; }
   @media (max-width: 960px) {
     .detail { grid-template-columns: 1fr; }
-    .side { position: static; }
+    .side { position: static; order: -1; }
+    .side-card { padding: 22px; }
+  }
+  @media (max-width: 600px) {
+    .lead-img, .lead-img img { max-height: 280px; }
+    .lead-img { margin-bottom: 22px; }
+    .lead-img.contain img { max-height: 200px; }
+    .prose p { font-size: 1.08rem; }
   }
 </style>

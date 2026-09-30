@@ -29,6 +29,7 @@ const kindIcon = { mass: 'cross', adoration: 'candle', confession: 'heart' } as 
     </section>
   ))}
 </div>
+<p class="swipe-hint" aria-hidden="true">{lang === 'en' ? 'Swipe to see each day →' : '← اسحب لرؤية كل يوم'}</p>
 
 <style>
   .week { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
@@ -54,6 +55,9 @@ const kindIcon = { mass: 'cross', adoration: 'candle', confession: 'heart' } as 
   .svc.mass .svc-time { font-size: 1.5rem; }
   .svc:not(.mass) .svc-time { color: var(--muted); font-size: 1.15rem; }
 
+  .swipe-hint { display: none; margin: 4px 0 0; font-size: 0.85rem; text-align: center; color: var(--muted); }
+  .dark + .swipe-hint { color: #cdb893; }
+  @media (max-width: 860px) { .swipe-hint { display: block; } }
   .dark .day { background: rgba(255, 248, 236, 0.05); border-color: rgba(234, 215, 168, 0.22); box-shadow: none; }
   .dark h3 { color: #fff7e8; }
   .dark .svc { border-color: rgba(234, 215, 168, 0.18); }
@@ -64,7 +68,18 @@ const kindIcon = { mass: 'cross', adoration: 'candle', confession: 'heart' } as 
   .dark .svc-note { color: var(--gold-2); }
   .dark .day.is-today { border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(212, 173, 95, 0.2); }
 
-  @media (max-width: 860px) { .week { grid-template-columns: 1fr; } }
+  @media (max-width: 860px) {
+    .week {
+      display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px;
+      margin-inline: calc(var(--gutter) * -1); padding: 4px var(--gutter) 14px; scrollbar-width: none;
+    }
+    .week::-webkit-scrollbar { display: none; }
+    .day { flex: 0 0 min(84%, 360px); scroll-snap-align: center; padding: 22px 18px 12px; }
+    .svc { grid-template-columns: 84px 1fr; padding: 12px 0; }
+    :global(html[lang='ar']) .svc { grid-template-columns: 96px 1fr; }
+    .svc-time { font-size: 1.15rem; }
+    .svc.mass .svc-time { font-size: 1.3rem; }
+  }
 </style>
 
 <script>
@@ -75,5 +90,10 @@ const kindIcon = { mass: 'cross', adoration: 'candle', confession: 'heart' } as 
     el.classList.add('is-today');
     const pill = el.querySelector<HTMLElement>('.today-pill');
     if (pill) pill.hidden = false;
+    const week = el.parentElement;
+    if (week && window.matchMedia('(max-width: 860px)').matches) {
+      const d = el.getBoundingClientRect().left - week.getBoundingClientRect().left - (week.clientWidth - el.clientWidth) / 2;
+      week.scrollBy({ left: d, behavior: 'instant' as ScrollBehavior });
+    }
   });
 </script>

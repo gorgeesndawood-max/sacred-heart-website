@@ -93,7 +93,17 @@ const massData = JSON.stringify(
     <button class="menu-close" type="button" data-menu-close><Icon name="x" size={26} /><span class="sr-only">{t(lang, 'nav.close')}</span></button>
     <ul>
       <li><a href={href('/', lang)}>{t(lang, 'nav.home')}</a></li>
-      {nav.map((n) => <li><a href={href(n.to, lang)} aria-current={isActive(n.to) ? 'page' : undefined}>{t(lang, n.key)}</a></li>)}
+      {nav.map((n) => 'menu' in n ? (
+        <li>
+          <details class="m-sub">
+            <summary>{t(lang, n.key)} <Icon name="chevron" size={22} /></summary>
+            <ul>
+              <li><a href={href(n.to, lang)}>{t(lang, 'nav.allMinistries')}</a></li>
+              {ministries.map((m) => <li><a href={href(`/ministries/${m.slug}`, lang)}>{m.name[lang]}</a></li>)}
+            </ul>
+          </details>
+        </li>
+      ) : <li><a href={href(n.to, lang)} aria-current={isActive(n.to) ? 'page' : undefined}>{t(lang, n.key)}</a></li>)}
       <li><a href={href(routes.support, lang)}>{t(lang, 'nav.support')}</a></li>
     </ul>
     <div class="mobile-nav-foot">
@@ -104,7 +114,43 @@ const massData = JSON.stringify(
   </div>
 </div>
 
+<nav class="action-bar" aria-label={lang === 'en' ? 'Quick actions' : 'إجراءات سريعة'}>
+  <a href={href(routes.mass, lang)}><Icon name="clock" size={22} /><span>{lang === 'en' ? 'Mass' : 'القداس'}</span></a>
+  <a href={`tel:${site.phone.tel}`}><Icon name="phone" size={22} /><span>{t(lang, 'cta.call')}</span></a>
+  <a href={site.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" size={22} /><span>{lang === 'en' ? 'Directions' : 'الاتجاهات'}</span></a>
+  <a class="ab-primary" href={href(routes.contact, lang) + '#signup'}><Icon name="users" size={22} /><span>{lang === 'en' ? 'Join' : 'انضمّ'}</span></a>
+</nav>
+
 <style>
+  .action-bar { display: none; }
+  @media (max-width: 720px) {
+    .action-bar {
+      position: fixed; z-index: 60; inset-inline: 0; bottom: 0;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+      background: rgba(58, 13, 19, 0.96); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(234, 215, 168, 0.25); box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+    }
+    .action-bar a {
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+      min-height: 54px; border-radius: 12px; color: #f0e2c8; text-decoration: none; font-size: 0.78rem; font-weight: 600;
+    }
+    .action-bar a :global(svg) { color: var(--gold-2); }
+    .action-bar a:active { background: rgba(255, 255, 255, 0.08); }
+    .action-bar .ab-primary { background: var(--gold); color: #fff; }
+    .action-bar .ab-primary :global(svg) { color: #fff; }
+    :global(body) { padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
+  }
+  .m-sub summary {
+    list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    padding: 14px 4px; border-bottom: 1px solid var(--line);
+    font-family: var(--serif); font-size: 1.7rem; font-weight: 600; color: var(--burgundy-deep);
+  }
+  .m-sub summary::-webkit-details-marker { display: none; }
+  .m-sub summary :global(svg) { color: var(--gold); transition: transform 0.2s; }
+  .m-sub[open] summary :global(svg) { transform: rotate(180deg); }
+  .m-sub ul { margin: 4px 0 8px !important; padding-inline-start: 12px !important; }
+  .mobile-nav .m-sub li a { font-family: var(--sans); font-size: 1.05rem; font-weight: 600; padding: 10px 4px; color: var(--ink); border-bottom: 1px dashed var(--line); }
   .topbar { background: var(--burgundy-deep); color: #ecdcc2; font-size: 0.9rem; }
   .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 40px; }
   .topbar p { margin: 0; display: flex; align-items: center; gap: 8px; min-width: 0; }
@@ -204,8 +250,8 @@ const massData = JSON.stringify(
     .nm-label { display: none; }
     .hide-sm { display: none; }
     .show-sm { display: inline; }
-    .topbar-links { gap: 14px; }
-    .topbar-links a:last-child { display: none; }
+    .topbar-links { display: none; }
+    .topbar-inner { justify-content: center; }
   }
   @media (max-width: 520px) {
     .header-inner { min-height: 68px; gap: 12px; }
