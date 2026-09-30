@@ -1,0 +1,109 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import MinistryCard from '../components/MinistryCard.astro';
+import Icon from '../components/Icon.astro';
+import Cross from '../components/Cross.astro';
+import { site, type Lang } from '../data/site';
+import { ministries, categories, type Ministry } from '../data/ministries';
+import { t, href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang; m: Ministry }
+const { lang, m } = Astro.props;
+
+const related = [
+  ...ministries.filter((x) => x.category === m.category && x.slug !== m.slug),
+  ...ministries.filter((x) => x.category !== m.category),
+].slice(0, 3);
+const signup = href(routes.contact, lang) + `?interest=${m.slug}#signup`;
+---
+<Base lang={lang} title={m.name[lang]} description={`${m.tagline[lang]} ${m.body[0][lang]}`.slice(0, 158)} image={m.image}>
+  <PageHero
+    lang={lang}
+    eyebrow={categories[m.category][lang]}
+    title={m.name[lang]}
+    lede={m.tagline[lang]}
+    image={m.gallery?.[0] ?? m.image}
+    crumbs={[{ label: t(lang, 'nav.ministries'), to: routes.ministries }]}
+  />
+
+  <section class="section">
+    <div class="wrap detail">
+      <article class="reveal">
+        <figure class={`lead-img ${m.imageFit === 'contain' ? 'contain' : ''}`}>
+          <img src={m.image} alt={m.name[lang]} />
+        </figure>
+        <div class="prose">{m.body.map((p) => <p>{p[lang]}</p>)}</div>
+        {m.gallery && m.gallery.length > 0 && (
+          <div class="gallery">
+            {m.gallery.filter((g) => g !== m.image).map((g) => <img src={g} alt="" loading="lazy" />)}
+          </div>
+        )}
+      </article>
+
+      <aside class="side reveal">
+        <div class="side-card card">
+          <h2 class="side-title"><Cross size={18} /> {lang === 'en' ? 'At a glance' : 'في لمحة'}</h2>
+          <dl>
+            {m.meets && (<div><dt><Icon name="clock" size={18} /> {t(lang, 'meets')}</dt><dd>{m.meets.when[lang]}</dd></div>)}
+            {m.audience && (<div><dt><Icon name="users" size={18} /> {t(lang, 'who')}</dt><dd>{m.audience[lang]}</dd></div>)}
+            {m.leaders && (<div><dt><Icon name="star" size={18} /> {t(lang, 'leaders')}</dt><dd>{m.leaders[lang]}</dd></div>)}
+            <div><dt><Icon name="pin" size={18} /> {lang === 'en' ? 'Where' : 'المكان'}</dt><dd>{m.meets?.where?.[lang] ?? site.name[lang]}<br /><span class="muted" dir="ltr">{site.address.oneLine}</span></dd></div>
+            {m.contact?.email && (<div><dt><Icon name="mail" size={18} /> {t(lang, 'contact.email')}</dt><dd><a href={`mailto:${m.contact.email}`}>{m.contact.email}</a></dd></div>)}
+            {m.contact?.instagram && (<div><dt><Icon name="instagram" size={18} /> Instagram</dt><dd><a href={m.contact.instagram} target="_blank" rel="noopener">@{m.contact.instagram.split('/').filter(Boolean).pop()}</a></dd></div>)}
+          </dl>
+          <a class="btn" href={signup}>{t(lang, 'cta.interested')} <Icon name="arrow" class="dir" /></a>
+          <a class="btn btn-ghost" href={`tel:${site.phone.tel}`}><Icon name="phone" /> <span dir="ltr">{site.phone.display}</span></a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {m.verse && (
+    <section class="section-tight bg-burgundy">
+      <div class="wrap verse reveal">
+        <div class="divider"><Cross /></div>
+        <blockquote>“{m.verse.text[lang]}”</blockquote>
+        <cite>{m.verse.ref[lang]}</cite>
+      </div>
+    </section>
+  )}
+
+  <section class="section bg-paper">
+    <div class="wrap">
+      <div class="section-head split">
+        <h2>{lang === 'en' ? 'More ways to serve' : 'طرق أخرى للخدمة'}</h2>
+        <a class="link-arrow" href={href(routes.ministries, lang)}>{t(lang, 'nav.allMinistries')} <Icon name="arrow" size={18} /></a>
+      </div>
+      <div class="grid grid-3">
+        {related.map((r) => <MinistryCard m={r} lang={lang} />)}
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .detail { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: clamp(32px, 5vw, 72px); align-items: start; }
+  .lead-img { margin: 0 0 32px; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow); background: var(--cream-2); max-height: 520px; }
+  .lead-img img { width: 100%; max-height: 520px; object-fit: cover; }
+  .lead-img.contain { display: grid; place-items: center; padding: 32px; background: radial-gradient(circle at 50% 40%, #fff, var(--cream-2)); }
+  .lead-img.contain img { object-fit: contain; max-height: 340px; width: auto; }
+  .prose p { font-size: 1.15rem; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 28px; }
+  .gallery img { aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; width: 100%; }
+  .side { position: sticky; top: 104px; }
+  .side-card { padding: 28px; display: grid; gap: 12px; }
+  .side-title { display: flex; align-items: center; gap: 10px; font-size: 1.6rem; margin: 0 0 4px; }
+  .side-title :global(svg) { color: var(--gold); }
+  dl { margin: 0 0 8px; }
+  dl > div { padding: 14px 0; border-top: 1px dashed var(--line); }
+  dt { display: flex; align-items: center; gap: 8px; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  :global(html[lang='ar']) dt { letter-spacing: 0; font-size: 0.95rem; }
+  dd { margin: 0; color: var(--ink); }
+  dd a { word-break: break-all; }
+  .muted { color: var(--muted); font-size: 0.9rem; }
+  @media (max-width: 960px) {
+    .detail { grid-template-columns: 1fr; }
+    .side { position: static; }
+  }
+</style>

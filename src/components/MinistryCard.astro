@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+import { type Lang } from '../data/site';
+import { categories, type Ministry } from '../data/ministries';
+import { t, href } from '../i18n/ui';
+
+interface Props { m: Ministry; lang: Lang }
+const { m, lang } = Astro.props;
+---
+<a class="mcard card" href={href(`/ministries/${m.slug}`, lang)}>
+  <div class={`mc-img ${m.imageFit === 'contain' ? 'contain' : ''}`}>
+    <img src={m.image} alt="" loading="lazy" />
+  </div>
+  <div class="mc-body">
+    <span class="mc-cat">{categories[m.category][lang]}</span>
+    <h3>{m.name[lang]}</h3>
+    <p>{m.tagline[lang]}</p>
+    {m.meets && <p class="mc-when"><Icon name="clock" size={15} /> <span>{m.meets.when[lang]}</span></p>}
+    <span class="link-arrow">{t(lang, 'cta.learnMore')} <Icon name="arrow" size={16} /></span>
+  </div>
+</a>
+
+<style>
+  .mcard { display: flex; flex-direction: column; text-decoration: none; color: inherit; height: 100%; transition: transform 0.3s var(--ease), box-shadow 0.3s; }
+  .mcard:hover { transform: translateY(-4px); box-shadow: var(--shadow); color: inherit; }
+  .mc-img { aspect-ratio: 4 / 3; overflow: hidden; background: var(--cream-2); }
+  .mc-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+  .mc-img.contain { background: radial-gradient(circle at 50% 45%, #fff, var(--cream-2)); padding: 22px; }
+  .mc-img.contain img { object-fit: contain; }
+  .mcard:hover .mc-img img { transform: scale(1.04); }
+  .mc-body { padding: 22px 22px 24px; display: flex; flex-direction: column; flex: 1; }
+  .mc-cat { font-family: var(--caps); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  :global(html[lang='ar']) .mc-cat { font-size: 0.9rem; letter-spacing: 0; }
+  h3 { margin: 6px 0 8px; font-size: 1.5rem; }
+  p { color: var(--ink-2); font-size: 1rem; margin-bottom: 12px; }
+  .mc-when { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9rem; color: var(--muted); }
+  .mc-when :global(svg) { color: var(--gold); margin-top: 4px; flex: none; }
+  .link-arrow { margin-top: auto; color: var(--burgundy); }
+</style>

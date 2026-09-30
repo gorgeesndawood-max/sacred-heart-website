@@ -1,0 +1,116 @@
+---
+import Icon from './Icon.astro';
+import Cross from './Cross.astro';
+import { site, schedule, scheduleDays, days, fmtTime, type Lang } from '../data/site';
+import { t, href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const year = new Date().getFullYear();
+const links = [
+  ['nav.about', routes.about], ['nav.mass', routes.mass], ['nav.ministries', routes.ministries],
+  ['nav.events', routes.events], ['nav.contact', routes.contact], ['nav.support', routes.support],
+] as const;
+---
+<footer class="site-footer bg-burgundy">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="/images/logo.webp" alt="" width="60" height="97" loading="lazy" />
+        <div>
+          <p class="fb-name">{site.name[lang]}</p>
+          <p class="fb-sub">{lang === 'en' ? `Serving the Chaldean community since ${site.founded}` : `في خدمة الجالية الكلدانية منذ عام ١٩٧٥`}</p>
+          <div class="social">
+            <a href={site.social.instagram} target="_blank" rel="noopener" aria-label="Instagram"><Icon name="instagram" size={20} /></a>
+            <a href={site.social.facebook} target="_blank" rel="noopener" aria-label="Facebook"><Icon name="facebook" size={20} /></a>
+            <a href={`mailto:${site.email}`} aria-label={t(lang, 'contact.email')}><Icon name="mail" size={20} /></a>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-cols">
+        <div>
+          <h3>{t(lang, 'schedule.title')}</h3>
+          <ul class="mini-sched">
+            {scheduleDays.map((d) => (
+              <li>
+                <span>{days[d][lang]}</span>
+                <span>{schedule.filter((s) => s.day === d && s.kind === 'mass').map((s) => fmtTime(s.time, lang)).join(' · ')}</span>
+              </li>
+            ))}
+          </ul>
+          <a class="link-arrow" href={href(routes.mass, lang)}>{lang === 'en' ? 'Full schedule & confessions' : 'البرنامج الكامل والاعتراف'} <Icon name="arrow" size={16} /></a>
+        </div>
+        <div>
+          <h3>{t(lang, 'footer.address')}</h3>
+          <address>
+            <a href={site.mapsUrl} target="_blank" rel="noopener" dir="ltr">{site.address.street}<br />{site.address.city}, {site.address.state} {site.address.zip}</a>
+          </address>
+          <h3 class="mt">{t(lang, 'footer.hours')}</h3>
+          <p>{site.officeHours[lang]}</p>
+        </div>
+        <div>
+          <h3>{t(lang, 'footer.contact')}</h3>
+          <ul class="contact-list">
+            <li><span>{t(lang, 'footer.office')}</span> <a href={`tel:${site.phone.tel}`} dir="ltr">{site.phone.display}</a></li>
+            <li><span>{t(lang, 'footer.fax')}</span> <span dir="ltr">{site.fax}</span></li>
+            <li><span>{t(lang, 'contact.email')}</span> <a href={`mailto:${site.email}`}>{site.email}</a></li>
+            <li><span>{t(lang, 'footer.pastor')}</span> {site.pastor[lang]}</li>
+          </ul>
+        </div>
+        <div>
+          <h3>{t(lang, 'footer.explore')}</h3>
+          <ul class="footer-links">
+            {links.map(([k, to]) => <li><a href={href(to, lang)}>{t(lang, k)}</a></li>)}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>
+        <Cross size={14} /> {t(lang, 'footer.eparchy')} <a href={site.eparchyUrl} target="_blank" rel="noopener">{site.eparchy[lang]}</a>
+      </p>
+      <p>© {year} {site.name[lang]}. {t(lang, 'footer.rights')}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding: clamp(56px, 7vw, 88px) 0 28px; font-size: 1rem; }
+  .footer-top { display: grid; grid-template-columns: minmax(240px, 1fr) 3fr; gap: clamp(32px, 5vw, 64px); }
+  .footer-brand { display: flex; gap: 16px; align-items: flex-start; }
+  .footer-brand img { width: 60px; height: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,.3)); background: #fff8ec; border-radius: 14px; padding: 6px; }
+  .fb-name { font-family: var(--serif); font-size: 1.45rem; font-weight: 600; line-height: 1.2; color: #fff7e8; margin: 0 0 6px; }
+  .fb-sub { color: #d7c3a3; margin: 0 0 16px; font-size: 0.95rem; }
+  .social { display: flex; gap: 8px; }
+  .social a {
+    width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%;
+    border: 1px solid rgba(234, 215, 168, 0.35); color: var(--gold-soft) !important; transition: background 0.2s, border-color 0.2s;
+  }
+  .social a:hover { background: rgba(255,255,255,.08); border-color: var(--gold-2); }
+  .footer-cols { display: grid; grid-template-columns: 1.15fr 1fr 1.1fr 0.75fr; gap: 32px; }
+  h3 { font-family: var(--caps); font-size: 0.78rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-2) !important; margin: 0 0 14px; font-weight: 600; }
+  :global(html[lang='ar']) .site-footer h3 { font-size: 1rem; letter-spacing: 0; }
+  h3.mt { margin-top: 24px; }
+  ul { list-style: none; padding: 0; margin: 0 0 14px; }
+  address { font-style: normal; }
+  .mini-sched li { display: grid; gap: 0; padding: 7px 0; border-bottom: 1px dashed rgba(234, 215, 168, 0.2); }
+  .mini-sched li span:first-child { color: #fff7e8; font-weight: 600; }
+  .mini-sched li span:last-child { color: #d7c3a3; font-size: 0.95rem; }
+  .contact-list li { padding: 3px 0; }
+  .contact-list li > span:first-child { display: block; font-size: 0.8rem; color: #bda882; }
+  .contact-list a { word-break: break-all; }
+  .footer-links li { padding: 4px 0; }
+  .footer-links a { color: #f0e2c8 !important; text-decoration: none; }
+  .footer-links a:hover { color: #fff !important; text-decoration: underline; }
+  .footer-bottom {
+    margin-top: 48px; padding-top: 22px; border-top: 1px solid rgba(234, 215, 168, 0.2);
+    display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 0.88rem; color: #bda882;
+  }
+  .footer-bottom p { margin: 0; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .footer-bottom :global(svg) { color: var(--gold-2); }
+  @media (max-width: 1080px) { .footer-top { grid-template-columns: 1fr; } }
+  @media (max-width: 760px) { .footer-cols { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 460px) { .footer-cols { grid-template-columns: 1fr; } }
+</style>

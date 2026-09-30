@@ -1,0 +1,239 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Cross from '../components/Cross.astro';
+import { site, type Lang } from '../data/site';
+import { t, href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const c = {
+  en: {
+    title: 'About Us',
+    desc: 'The story of Sacred Heart Chaldean Catholic Church: founded in 1975 in Detroit\'s Chaldean Town, now serving the Chaldean community in Warren, Michigan.',
+    eyebrow: 'Our Story',
+    h1: 'Fifty years of faith, family & tradition',
+    lede: 'A parish built by its people, for its people.',
+    storyTitle: 'Where we come from',
+    story: [
+      'Sacred Heart Chaldean Catholic Church was founded in Detroit in 1975, in the middle of Chaldean Town. In those years many Chaldean families were arriving from Iraq, often as refugees, carrying little more than their faith. This church helped them keep that faith strong.',
+      'Sacred Heart became more than a place to pray. It united our Chaldean community and kept us together: a place to baptize our children, marry, mourn, celebrate our feasts, and hear the Mass in the language of our grandparents.',
+      'Today our parish home is on Dequindre Road in Warren. The faces have multiplied and the generations have grown, but the mission has not changed: to pray, and to serve God and His children.',
+    ],
+    timeline: [
+      ['1975', 'Founded in Chaldean Town', 'Sacred Heart opens its doors in Detroit to serve families arriving from Iraq.'],
+      ['Through the years', 'A community takes root', 'Choirs, prayer groups, catechism and feast-day celebrations grow alongside the Chaldean community of Metro Detroit.'],
+      ['2021', 'A new chapter', 'Fr. Fadi Philip is appointed pastor, and Deacon Luay Alyas begins teaching the Aramaic / Chaldean language class.'],
+      ['Today', 'Warren, Michigan', 'Masses in Sureth, Arabic and English, 13 ministries, and a youth group preparing the next generation of saints.'],
+    ],
+    whoEyebrow: 'Who are the Chaldeans?',
+    whoTitle: 'An ancient Church, praying in the language of Jesus',
+    who: [
+      ['cross', 'Fully Catholic', 'The Chaldean Catholic Church is an Eastern Catholic Church in full communion with the Pope in Rome, with its own Patriarch, traditions and liturgy.'],
+      ['book', 'Apostolic roots', 'Our faith traces back to the earliest Christians of Mesopotamia, evangelized by St. Thomas the Apostle and his disciples Addai and Mari.'],
+      ['music', 'Aramaic liturgy', 'We celebrate the Holy Qurbana (the Mass) using one of the oldest liturgies in Christianity, prayed in Aramaic, the language Jesus spoke, and in Sureth, its living form.'],
+      ['users', 'A Michigan family', 'Metro Detroit is home to one of the largest Chaldean communities in the world outside of Iraq, served by the Eparchy of St. Thomas the Apostle.'],
+    ],
+    heartEyebrow: 'Our Patron',
+    heartTitle: 'The Most Sacred Heart of Jesus',
+    heart: [
+      'Our parish is named for the Sacred Heart of Jesus: His human heart, pierced on the Cross, crowned with thorns and burning with love for every person.',
+      'The devotion invites us to return love for love: to receive Holy Communion, to spend time in Adoration, and to make reparation for the ways the world wounds that Heart. That is why Adoration and the Rosary are prayed before Mass every Friday and Saturday.',
+      'Each June we celebrate our parish feast, the Solemnity of the Sacred Heart, with a special Mass and a celebration that brings the whole community together.',
+    ],
+    heartVerse: '“Take my yoke upon you and learn from me, for I am meek and humble of heart.” (Matthew 11:29)',
+    pastorEyebrow: 'Our Pastor',
+    pastorTitle: 'Fr. Fadi Philip',
+    pastorText: 'Fr. Fadi Philip has served as pastor of Sacred Heart since 2021. Whether you are new to the parish, preparing for a sacrament, or simply need to talk, you are welcome to reach out to Father through the parish office.',
+    pastorCta: 'Contact the office',
+    galleryTitle: 'Inside our parish',
+    ctaTitle: 'Come and see',
+    ctaText: 'Join us for Mass this weekend, or stop by the office Monday to Friday. We would love to welcome you.',
+  },
+  ar: {
+    title: 'من نحن',
+    desc: 'قصّة كنيسة القلب الأقدس الكلدانية الكاثوليكية: تأسّست عام ١٩٧٥ في الحيّ الكلداني في ديترويت، وتخدم اليوم الجالية الكلدانية في وارن، ميشيغان.',
+    eyebrow: 'قصّتنا',
+    h1: 'خمسون عاماً من الإيمان والعائلة والتقاليد',
+    lede: 'رعية بناها أبناؤها، لأبنائها.',
+    storyTitle: 'من أين أتينا',
+    story: [
+      'تأسّست كنيسة القلب الأقدس الكلدانية الكاثوليكية في ديترويت عام ١٩٧٥، في قلب الحيّ الكلداني. في تلك السنوات كانت عائلات كلدانية كثيرة تصل من العراق، وغالباً كلاجئين، لا يحملون معهم سوى إيمانهم. ساعدتهم هذه الكنيسة على الحفاظ على ذلك الإيمان قوياً.',
+      'أصبحت كنيسة القلب الأقدس أكثر من مكان للصلاة. لقد وحّدت جاليتنا الكلدانية وأبقتنا معاً: مكاناً نعمّد فيه أطفالنا، ونتزوّج، ونودّع أحبّاءنا، ونحتفل بأعيادنا، ونسمع القداس بلغة أجدادنا.',
+      'واليوم بيتنا الرعوي في شارع ديكوندر في وارن. لقد تكاثرت الوجوه ونمت الأجيال، لكن الرسالة لم تتغيّر: أن نصلّي، وأن نخدم الله وأبناءه.',
+    ],
+    timeline: [
+      ['١٩٧٥', 'التأسيس في الحيّ الكلداني', 'كنيسة القلب الأقدس تفتح أبوابها في ديترويت لخدمة العائلات القادمة من العراق.'],
+      ['عبر السنين', 'جالية تتجذّر', 'تنمو الجوقات والأخويات والتعليم المسيحي والاحتفالات بالأعياد مع الجالية الكلدانية في ديترويت الكبرى.'],
+      ['٢٠٢١', 'فصل جديد', 'تعيين الأب فادي فيليب كاهناً للرعية، وبدء الشمّاس لؤي الياس بتعليم صف اللغة الآرامية / الكلدانية.'],
+      ['اليوم', 'وارن، ميشيغان', 'قداديس بالسورث والعربية والإنجليزية، و١٣ خدمة، وشبيبة تُعِدّ الجيل القادم من القديسين.'],
+    ],
+    whoEyebrow: 'من هم الكلدان؟',
+    whoTitle: 'كنيسة عريقة تصلّي بلغة يسوع',
+    who: [
+      ['cross', 'كاثوليكية بالكامل', 'الكنيسة الكلدانية الكاثوليكية هي كنيسة كاثوليكية شرقية في شركة كاملة مع البابا في روما، ولها بطريركها وتقاليدها وطقسها الخاص.'],
+      ['book', 'جذور رسولية', 'يعود إيماننا إلى أوائل المسيحيين في بلاد ما بين النهرين، الذين بشّرهم القديس توما الرسول وتلميذاه أدّي وماري.'],
+      ['music', 'طقس آرامي', 'نحتفل بالقربانا المقدسة (القداس) بواحد من أقدم الطقوس في المسيحية، نصلّيه بالآرامية، اللغة التي تكلّم بها يسوع، وبالسورث، صورتها الحيّة.'],
+      ['users', 'عائلة في ميشيغان', 'تضمّ منطقة ديترويت الكبرى واحدة من أكبر الجاليات الكلدانية في العالم خارج العراق، وتخدمها أبرشية مار توما الرسول.'],
+    ],
+    heartEyebrow: 'شفيعنا',
+    heartTitle: 'قلب يسوع الأقدس',
+    heart: [
+      'تحمل رعيتنا اسم قلب يسوع الأقدس: قلبه البشري الذي طُعن على الصليب، المكلّل بالشوك والمتّقد حبّاً لكل إنسان.',
+      'تدعونا هذه العبادة إلى أن نبادل الحبّ بالحبّ: بالمناولة المقدسة، وبالسجود للقربان، وبالتعويض عن جراح العالم لهذا القلب. لذلك نصلّي السجود والمسبحة الوردية قبل القداس كل جمعة وسبت.',
+      'وفي كل حزيران نحتفل بعيد رعيتنا، عيد قلب يسوع الأقدس، بقداس احتفالي وسهرة تجمع الجالية كلّها.',
+    ],
+    heartVerse: '«اِحْمِلُوا نِيرِي عَلَيْكُمْ وَتَعَلَّمُوا مِنِّي، لأَنِّي وَدِيعٌ وَمُتَوَاضِعُ الْقَلْبِ» (متى ١١: ٢٩)',
+    pastorEyebrow: 'كاهن الرعية',
+    pastorTitle: 'الأب فادي فيليب',
+    pastorText: 'يخدم الأب فادي فيليب كاهناً لرعية القلب الأقدس منذ عام ٢٠٢١. سواء كنت جديداً في الرعية، أو تستعدّ لسرّ من الأسرار، أو تحتاج ببساطة إلى الحديث، يمكنك التواصل مع الأب عبر مكتب الكنيسة.',
+    pastorCta: 'تواصل مع المكتب',
+    galleryTitle: 'من داخل رعيتنا',
+    ctaTitle: 'تعالوا وانظروا',
+    ctaText: 'انضمّوا إلينا في قداس نهاية هذا الأسبوع، أو مرّوا على المكتب من الاثنين إلى الجمعة. يسعدنا الترحيب بكم.',
+  },
+}[lang];
+
+const gallery = [
+  ['/images/sanctuary-full.webp', 'wide'], ['/images/ig/exaltation-reel.webp', 'tall'], ['/images/bells-choir-1.webp', ''],
+  ['/images/choir-group.webp', ''], ['/images/ig/corpus-christi-reel.webp', 'tall'], ['/images/youth-2.webp', ''],
+  ['/images/bells-closeup.webp', ''], ['/images/youth-9.webp', 'wide'],
+];
+---
+<Base lang={lang} title={c.title} description={c.desc} image="/images/sanctuary-about.webp">
+  <PageHero lang={lang} eyebrow={c.eyebrow} title={c.h1} lede={c.lede} image="/images/sanctuary-about.webp" />
+
+  <section class="section">
+    <div class="wrap story-grid">
+      <div class="reveal">
+        <p class="eyebrow">{c.eyebrow}</p>
+        <h2>{c.storyTitle}</h2>
+        <div class="prose">{c.story.map((p) => <p>{p}</p>)}</div>
+      </div>
+      <ol class="timeline reveal">
+        {c.timeline.map(([y, h, p]) => (
+          <li><span class="tl-year">{y}</span><h3>{h}</h3><p>{p}</p></li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section bg-paper">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <p class="eyebrow">{c.whoEyebrow}</p>
+        <h2>{c.whoTitle}</h2>
+      </div>
+      <div class="grid grid-4">
+        {c.who.map(([i, h, p]) => (
+          <div class="who reveal">
+            <span class="who-icon"><Icon name={i as 'cross'} size={26} /></span>
+            <h3>{h}</h3>
+            <p>{p}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg-burgundy heart-band">
+    <div class="wrap heart-grid">
+      <div class="arch heart-arch reveal">
+        <div class="arch-inner"><img src="/images/sacred-heart-jesus.webp" alt={lang === 'en' ? 'Jesus revealing His Sacred Heart' : 'يسوع يُظهر قلبه الأقدس'} loading="lazy" /></div>
+      </div>
+      <div class="reveal">
+        <p class="eyebrow">{c.heartEyebrow}</p>
+        <h2>{c.heartTitle}</h2>
+        {c.heart.map((p) => <p class="heart-p">{p}</p>)}
+        <p class="heart-verse"><Cross size={16} /> {c.heartVerse}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="pastor card reveal">
+        <div class="pastor-seal"><img src="/images/logo.webp" alt="" loading="lazy" /></div>
+        <div>
+          <p class="eyebrow">{c.pastorEyebrow}</p>
+          <h2>{c.pastorTitle}</h2>
+          <p>{c.pastorText}</p>
+          <div class="btn-row">
+            <a class="btn" href={href(routes.contact, lang)}>{c.pastorCta}</a>
+            <a class="btn btn-ghost" href={`tel:${site.phone.tel}`} dir="ltr"><Icon name="phone" /> {site.phone.display}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-tight bg-cream-2">
+    <div class="wrap">
+      <h2 class="center reveal">{c.galleryTitle}</h2>
+      <div class="gallery reveal">
+        {gallery.map(([src, size]) => <img class={size} src={src} alt="" loading="lazy" />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section center">
+    <div class="wrap wrap-narrow reveal">
+      <div class="divider"><Cross /></div>
+      <h2>{c.ctaTitle}</h2>
+      <p class="lede">{c.ctaText}</p>
+      <div class="btn-row">
+        <a class="btn" href={href(routes.mass, lang)}><Icon name="clock" /> {t(lang, 'cta.massTimes')}</a>
+        <a class="btn btn-ghost" href={site.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" /> {t(lang, 'cta.directions')}</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .story-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(32px, 6vw, 88px); align-items: start; }
+  .timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+  .timeline::before { content: ''; position: absolute; inset-inline-start: 11px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--gold-2), var(--line-gold)); }
+  .timeline li { position: relative; padding-inline-start: 44px; padding-bottom: 32px; }
+  .timeline li::before {
+    content: ''; position: absolute; inset-inline-start: 3px; top: 6px; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--cream); border: 3px solid var(--gold); box-shadow: 0 0 0 4px var(--cream);
+  }
+  .timeline li:last-child::before { background: var(--burgundy); border-color: var(--burgundy); }
+  .tl-year { font-family: var(--caps); font-weight: 700; color: var(--gold); letter-spacing: 0.12em; font-size: 0.9rem; }
+  :global(html[lang='ar']) .tl-year { letter-spacing: 0; font-size: 1.05rem; }
+  .timeline h3 { margin: 4px 0 6px; font-size: 1.5rem; }
+  .timeline p { color: var(--ink-2); font-size: 1rem; margin: 0; }
+
+  .who { padding: 28px 24px; background: var(--cream); border-radius: var(--radius-lg); border: 1px solid var(--line); height: 100%; }
+  .who-icon { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: var(--burgundy); color: var(--gold-soft); margin-bottom: 18px; }
+  .who h3 { font-size: 1.45rem; }
+  .who p { color: var(--ink-2); font-size: 1rem; margin: 0; }
+
+  .heart-grid { display: grid; grid-template-columns: 0.75fr 1.25fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
+  .heart-arch { aspect-ratio: 3 / 4; max-width: 380px; width: 100%; justify-self: center; }
+  .heart-p { color: #ecdcc2; }
+  .heart-verse { display: flex; gap: 10px; align-items: flex-start; margin-top: 1.6rem; padding-top: 1.2rem; border-top: 1px solid rgba(234, 215, 168, 0.25); font-family: var(--serif); font-style: italic; font-size: 1.3rem; color: var(--gold-soft); }
+  .heart-verse :global(svg) { margin-top: 8px; flex: none; color: var(--gold-2); }
+  :global(html[lang='ar']) .heart-verse { font-style: normal; }
+
+  .pastor { display: grid; grid-template-columns: auto 1fr; gap: clamp(24px, 4vw, 56px); padding: clamp(28px, 5vw, 56px); align-items: center; }
+  .pastor-seal { width: 180px; aspect-ratio: 1; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle, #fff, var(--cream-2)); border: 1px solid var(--line-gold); box-shadow: inset 0 0 0 8px var(--paper), inset 0 0 0 9px var(--line-gold); }
+  .pastor-seal img { height: 64%; width: auto; }
+  .pastor p:not(.eyebrow) { color: var(--ink-2); max-width: 60ch; }
+
+  .gallery { display: grid; grid-template-columns: repeat(4, 1fr); grid-auto-rows: 200px; gap: 12px; margin-top: 32px; }
+  .gallery img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+  .gallery .wide { grid-column: span 2; }
+  .gallery .tall { grid-row: span 2; }
+
+  @media (max-width: 900px) {
+    .story-grid, .heart-grid { grid-template-columns: 1fr; }
+    .gallery { grid-template-columns: repeat(2, 1fr); grid-auto-rows: 160px; }
+    .pastor { grid-template-columns: 1fr; text-align: center; }
+    .pastor-seal { width: 140px; margin: 0 auto; }
+    .pastor .btn-row { justify-content: center; }
+    .pastor .eyebrow::after { content: ''; width: 28px; height: 1px; background: currentColor; }
+  }
+</style>

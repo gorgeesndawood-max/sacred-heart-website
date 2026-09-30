@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/about-us", "destination": "/about", "permanent": true },
+    { "source": "/services", "destination": "/mass-times", "permanent": true },
+    { "source": "/about-3-1", "destination": "/ministries/bells-choir", "permanent": true },
+    { "source": "/team-3", "destination": "/ministries/super-saints", "permanent": true },
+    { "source": "/about-6", "destination": "/ministries/catechism", "permanent": true },
+    { "source": "/about-8", "destination": "/ministries/sacred-heart-group", "permanent": true },
+    { "source": "/about-3", "destination": "/ministries/aramaic-class", "permanent": true },
+    { "source": "/about-8-1", "destination": "/ministries/our-lady-of-perpetual-help", "permanent": true },
+    { "source": "/team-1", "destination": "/ministries/choir", "permanent": true },
+    { "source": "/donate", "destination": "/support", "permanent": true },
+    { "source": "/events-1/:slug*", "destination": "/events", "permanent": true },
+    { "source": "/account/:path*", "destination": "/", "permanent": true },
+    { "source": "/profile/:path*", "destination": "/", "permanent": true }
+  ],
+  "headers": [
+    {
+      "source": "/images/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=2592000, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
+      ]
+    }
+  ]
+}

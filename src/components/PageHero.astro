@@ -1,0 +1,47 @@
+---
+import Cross from './Cross.astro';
+import { type Lang } from '../data/site';
+import { t, href } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  eyebrow: string;
+  title: string;
+  lede?: string;
+  image?: string;
+  imageAlt?: string;
+  crumbs?: { label: string; to: string }[];
+}
+const { lang, eyebrow, title, lede, image, imageAlt = '', crumbs = [] } = Astro.props;
+---
+<section class="page-hero bg-burgundy">
+  {image && <div class="ph-bg" style={`background-image:url(${image})`} aria-hidden="true" />}
+  <div class="wrap ph-inner">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href={href('/', lang)}>{t(lang, 'nav.home')}</a>
+      {crumbs.map((c) => (<><span aria-hidden="true">/</span><a href={href(c.to, lang)}>{c.label}</a></>))}
+      <span aria-hidden="true">/</span><span aria-current="page">{title}</span>
+    </nav>
+    <div class="ph-cross"><Cross size={30} /></div>
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    {lede && <p class="lede">{lede}</p>}
+    <slot />
+  </div>
+  <svg class="ph-edge" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40V18C240 0 480 0 720 18s480 18 720 0v22z" fill="var(--cream)"/></svg>
+</section>
+
+<style>
+  .page-hero { position: relative; overflow: hidden; padding: clamp(48px, 7vw, 96px) 0 clamp(72px, 9vw, 120px); text-align: center; }
+  .ph-bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0.18; filter: sepia(0.4) blur(1px); mix-blend-mode: luminosity; }
+  .ph-inner { position: relative; }
+  .ph-cross { color: var(--gold-2); margin-bottom: 16px; display: flex; justify-content: center; }
+  .page-hero .eyebrow::after { content: ''; width: 28px; height: 1px; background: currentColor; }
+  h1 { max-width: 16ch; margin-inline: auto; }
+  .lede { margin-inline: auto; }
+  .crumbs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; font-size: 0.88rem; color: #cdb893; margin-bottom: 28px; }
+  .crumbs a { color: #e9d6b0 !important; text-decoration: none; }
+  .crumbs a:hover { text-decoration: underline; }
+  .crumbs [aria-current] { color: #fff7e8; }
+  .ph-edge { position: absolute; bottom: -1px; left: 0; width: 100%; height: 40px; }
+</style>

@@ -1,0 +1,142 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import EventCard from '../components/EventCard.astro';
+import Icon from '../components/Icon.astro';
+import { site, type Lang } from '../data/site';
+import { events, traditions } from '../data/events';
+import { t } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const isUpcoming = (e: { start: string; end?: string }) => new Date((e.end ?? e.start).slice(0, 10) + 'T23:59:59').getTime() >= Date.now();
+const upcoming = events.filter(isUpcoming);
+const past = events.filter((e) => !isUpcoming(e));
+
+const c = {
+  en: {
+    title: 'Events',
+    desc: 'Feast days, parties, pilgrimages and parish events at Sacred Heart Chaldean Catholic Church in Warren, Michigan.',
+    eyebrow: 'Parish Life',
+    h1: 'Events & Celebrations',
+    lede: 'From feast-day Masses to the Valentine\'s party, parish life at Sacred Heart is lived together.',
+    upcoming: 'Coming up',
+    emptyTitle: 'Nothing on the calendar just yet',
+    recent: 'Recent at Sacred Heart',
+    tradEyebrow: 'Through the year',
+    tradTitle: 'Our parish traditions',
+    tradLede: 'Some things we celebrate every year. Exact dates and tickets are announced at Mass and on Instagram.',
+    infoTitle: 'Tickets & information',
+    infoText: 'For tickets to parish parties and trips, call the office during business hours or call Hani.',
+  },
+  ar: {
+    title: 'المناسبات',
+    desc: 'الأعياد والحفلات ورحلات الحجّ ومناسبات الرعية في كنيسة القلب الأقدس الكلدانية في وارن، ميشيغان.',
+    eyebrow: 'حياة الرعية',
+    h1: 'المناسبات والاحتفالات',
+    lede: 'من قداديس الأعياد إلى حفلة عيد الحب، نعيش حياة الرعية في القلب الأقدس معاً.',
+    upcoming: 'قريباً',
+    emptyTitle: 'لا توجد مناسبات في التقويم حالياً',
+    recent: 'مؤخّراً في القلب الأقدس',
+    tradEyebrow: 'على مدار السنة',
+    tradTitle: 'تقاليد رعيتنا',
+    tradLede: 'بعض الأمور نحتفل بها كل عام. تُعلَن المواعيد والتذاكر في القداس وعلى إنستغرام.',
+    infoTitle: 'التذاكر والمعلومات',
+    infoText: 'لتذاكر حفلات الرعية والرحلات، اتصل بالمكتب خلال ساعات الدوام أو اتصل بهاني.',
+  },
+}[lang];
+---
+<Base lang={lang} title={c.title} description={c.desc} image="/images/ig/exaltation-reel.webp">
+  <PageHero lang={lang} eyebrow={c.eyebrow} title={c.h1} lede={c.lede} image="/images/ig/exaltation-reel.webp" />
+
+  <div data-events-root>
+    <section class="section-tight">
+      <div class="wrap">
+        <h2 class="reveal">{c.upcoming}</h2>
+        <ul class="grid grid-3 plain" data-upcoming hidden={upcoming.length === 0}>
+          {upcoming.map((e) => <li><EventCard event={e} lang={lang} /></li>)}
+        </ul>
+        <div class="empty card" data-upcoming-empty hidden={upcoming.length > 0}>
+          <Icon name="calendar" size={32} />
+          <div>
+            <h3>{c.emptyTitle}</h3>
+            <p>{t(lang, 'events.none')}</p>
+          </div>
+          <a class="btn" href={site.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" /> {t(lang, 'cta.follow')}</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section-tight bg-paper" data-recent-section hidden={past.length === 0}>
+      <div class="wrap">
+        <h2 class="reveal">{c.recent}</h2>
+        <ul class="grid grid-3 plain is-past" data-recent>
+          {past.map((e) => <li><EventCard event={e} lang={lang} /></li>)}
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <p class="eyebrow">{c.tradEyebrow}</p>
+        <h2>{c.tradTitle}</h2>
+        <p class="lede">{c.tradLede}</p>
+      </div>
+      <ol class="trads">
+        {traditions.map((tr) => (
+          <li class="trad reveal">
+            {tr.image && <img src={tr.image} alt="" loading="lazy" />}
+            <div>
+              <span class="trad-month">{tr.month[lang]}</span>
+              <h3>{tr.title[lang]}</h3>
+              <p>{tr.text[lang]}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section-tight bg-cream-2">
+    <div class="wrap">
+      <div class="tickets card reveal">
+        <div>
+          <h2>{c.infoTitle}</h2>
+          <p>{c.infoText}</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn" href={`tel:${site.phone.tel}`}><Icon name="phone" /> {t(lang, 'footer.office')} <span dir="ltr">{site.phone.display}</span></a>
+          <a class="btn btn-ghost" href={`tel:${site.eventsPhone.tel}`}><Icon name="phone" /> {site.eventsPhone.name[lang]} <span dir="ltr">{site.eventsPhone.display}</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { sortEvents } from '../scripts/events';
+  sortEvents();
+</script>
+
+<style>
+  .plain { list-style: none; padding: 0; margin: 0; }
+  h2 { margin-bottom: 28px; }
+  .empty { display: grid; grid-template-columns: auto 1fr auto; gap: 24px; align-items: center; padding: 32px; }
+  .empty > :global(svg) { color: var(--gold); }
+  .empty h3 { margin-bottom: 4px; }
+  .empty p { margin: 0; color: var(--ink-2); }
+  .trads { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 20px; }
+  .trad { display: grid; grid-template-columns: 110px 1fr; gap: 18px; padding: 16px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-lg); align-items: start; }
+  .trad img { width: 110px; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 10px; }
+  .trad-month { font-family: var(--caps); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  :global(html[lang='ar']) .trad-month { font-size: 0.95rem; letter-spacing: 0; }
+  .trad h3 { margin: 4px 0 6px; font-size: 1.35rem; }
+  .trad p { margin: 0; color: var(--ink-2); font-size: 0.98rem; }
+  .tickets { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; padding: clamp(24px, 4vw, 40px); }
+  .tickets h2 { margin-bottom: 6px; }
+  .tickets p { margin: 0; color: var(--ink-2); max-width: 52ch; }
+  @media (max-width: 720px) { .empty { grid-template-columns: 1fr; text-align: center; justify-items: center; } }
+</style>

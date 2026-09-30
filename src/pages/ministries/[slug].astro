@@ -1,0 +1,10 @@
+---
+import Ministry from '../../views/Ministry.astro';
+import { ministries, type Ministry as M } from '../../data/ministries';
+
+export function getStaticPaths() {
+  return ministries.map((m) => ({ params: { slug: m.slug }, props: { m } }));
+}
+const { m } = Astro.props as { m: M };
+---
+<Ministry lang="en" m={m} />

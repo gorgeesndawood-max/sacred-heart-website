@@ -1,0 +1,57 @@
+---
+import Icon from './Icon.astro';
+import { type Lang, toArabicDigits } from '../data/site';
+import type { ParishEvent } from '../data/events';
+
+interface Props { event: ParishEvent; lang: Lang }
+const { event: e, lang } = Astro.props;
+const d = new Date(e.start + ':00');
+const locale = lang === 'ar' ? 'ar-IQ' : 'en-US';
+const month = d.toLocaleDateString(locale, { month: 'short' });
+const day = lang === 'ar' ? toArabicDigits(String(d.getDate())) : String(d.getDate());
+const full = d.toLocaleDateString(locale, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+const time = d.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
+const tags = {
+  feast: { en: 'Feast Day', ar: 'عيد' },
+  social: { en: 'Community', ar: 'اجتماعي' },
+  youth: { en: 'Youth', ar: 'شبيبة' },
+  formation: { en: 'Formation', ar: 'تنشئة' },
+  pilgrimage: { en: 'Pilgrimage', ar: 'حجّ' },
+};
+---
+<article class="event card" data-event data-start={e.start} data-end={e.end ?? e.start}>
+  {e.image && (
+    <div class="ev-img"><img src={e.image} alt="" loading="lazy" /></div>
+  )}
+  <div class="ev-body">
+    <div class="ev-date" aria-hidden="true"><span>{month}</span><strong>{day}</strong></div>
+    <div>
+      <span class="badge badge-gold">{tags[e.tag][lang]}</span>
+      <h3>{e.title[lang]}</h3>
+      <p class="ev-meta"><Icon name="calendar" size={16} /> <time datetime={e.start}>{full} · {time}</time></p>
+      {e.location && <p class="ev-meta"><Icon name="pin" size={16} /> {e.location[lang]}</p>}
+      <p class="ev-sum">{e.summary[lang]}</p>
+      {e.contact && <p class="ev-contact"><Icon name="phone" size={16} /> {e.contact[lang]}</p>}
+    </div>
+  </div>
+</article>
+
+<style>
+  .event { display: flex; flex-direction: column; height: 100%; transition: transform 0.3s var(--ease), box-shadow 0.3s; }
+  .event:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+  .ev-img { aspect-ratio: 16 / 10; overflow: hidden; background: var(--cream-2); }
+  .ev-img img { width: 100%; height: 100%; object-fit: cover; object-position: center 30%; }
+  .ev-body { display: grid; grid-template-columns: auto 1fr; gap: 18px; padding: 22px; }
+  .ev-date {
+    width: 62px; text-align: center; border-radius: 12px; overflow: hidden; border: 1px solid var(--line-gold); background: #fff; align-self: start;
+  }
+  .ev-date span { display: block; background: var(--burgundy); color: #fff7e8; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; padding: 3px 0; }
+  .ev-date strong { display: block; font-family: var(--serif); font-size: 1.9rem; line-height: 1.3; color: var(--burgundy-deep); }
+  h3 { margin: 10px 0 8px; font-size: 1.45rem; }
+  .ev-meta { display: flex; align-items: center; gap: 8px; margin: 0 0 4px; font-size: 0.95rem; color: var(--muted); }
+  .ev-meta :global(svg) { color: var(--gold); flex: none; }
+  .ev-sum { margin: 12px 0 0; color: var(--ink-2); font-size: 1rem; }
+  .ev-contact { margin: 12px 0 0; font-size: 0.92rem; color: var(--burgundy); display: flex; gap: 8px; align-items: flex-start; }
+  .ev-contact :global(svg) { margin-top: 4px; flex: none; }
+  :global(.is-past) .event { opacity: 0.92; }
+</style>

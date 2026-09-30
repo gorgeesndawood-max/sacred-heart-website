@@ -1,0 +1,410 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Cross from '../components/Cross.astro';
+import ScheduleWeek from '../components/ScheduleWeek.astro';
+import MinistryCard from '../components/MinistryCard.astro';
+import EventCard from '../components/EventCard.astro';
+import { site, type Lang } from '../data/site';
+import { ministries } from '../data/ministries';
+import { events, traditions } from '../data/events';
+import { t, href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const featured = ['catechism', 'super-saints', 'bells-choir', 'mom-group', 'choir', 'aramaic-class']
+  .map((s) => ministries.find((m) => m.slug === s)!)
+  .filter(Boolean);
+
+const c = {
+  en: {
+    metaDesc: 'Sacred Heart Chaldean Catholic Church in Warren, Michigan. Holy Mass in Sureth, Arabic and English, Catechism & First Communion, youth group, choirs and parish life since 1975.',
+    eyebrow: 'Chaldean Catholic Church · Warren, Michigan',
+    h1a: 'Come home to the',
+    h1b: 'Heart of Jesus',
+    lede: 'For fifty years, Sacred Heart has kept our Chaldean faith alive: praying the ancient liturgy in the language of Christ, raising our children in the Church, and gathering as one family.',
+    stats: [['1975', 'Serving our community since'], ['3', 'Languages of prayer: Sureth, Arabic, English'], ['13', 'Ministries you can join']],
+    weekEyebrow: 'Join us at the altar',
+    weekTitle: 'This Week at Sacred Heart',
+    weekLede: 'Confessions are heard Friday and Saturday from 4 to 5 PM, followed by Adoration and the Rosary before Mass.',
+    weekLink: 'Full schedule & sacraments',
+    aboutEyebrow: 'Our Story',
+    aboutTitle: 'A church built by its people, for its people',
+    aboutP1: 'Sacred Heart was founded in 1975 in the heart of Detroit\'s Chaldean Town. As families arrived from Iraq, many as refugees, this parish helped them hold on to their faith, and it helped unite our Chaldean community and keep us together.',
+    aboutP2: 'Today our parish home is on Dequindre Road in Warren, where three generations pray side by side in Sureth, Arabic and English.',
+    aboutLink: 'Read our story',
+    catEyebrow: 'Now enrolling · 2026–2027',
+    catTitle: 'Catechism & First Communion',
+    catText: 'Classes for pre-school through 8th grade, and First Communion preparation for 3rd grade and up. Our children learn the faith, our Chaldean traditions, and prayers in Sureth and English.',
+    catFacts: [['calendar', 'Saturdays · 10:00 AM – 1:30 PM'], ['cross', 'Includes the 12:30 PM English Mass'], ['pin', 'Register at the parish office, Mon – Fri, 9 AM – 4 PM']],
+    catCta: 'Ask about registration',
+    minEyebrow: 'Get Involved',
+    minTitle: 'There is a place for you here',
+    minLede: 'No age is too young or too old. Everyone is called to serve, and every ministry welcomes you with open arms.',
+    minAll: 'See all 13 ministries',
+    verse: 'Come to me, all you who labor and are burdened, and I will give you rest… for I am meek and humble of heart.',
+    verseRef: 'Matthew 11:28–29',
+    evEyebrow: 'Parish Life',
+    evTitle: 'Upcoming at Sacred Heart',
+    evAll: 'All events',
+    evEmptyTitle: 'Through the year at Sacred Heart',
+    igEyebrow: 'Follow along',
+    igTitle: 'Life at Sacred Heart',
+    igText: 'Feast-day flyers, youth nights, and photos from Mass are posted on Instagram first.',
+    visitEyebrow: 'Plan your visit',
+    visitTitle: 'We would love to meet you',
+    visitText: 'Whether you are new to Warren, returning to the Church, or visiting family, you are welcome at every Mass. Stop by the office or introduce yourself after Mass. We would love to know your name.',
+    officeHours: 'Office hours',
+  },
+  ar: {
+    metaDesc: 'كنيسة القلب الأقدس الكلدانية الكاثوليكية في وارن، ميشيغان. القداس الإلهي بالسورث والعربية والإنجليزية، التعليم المسيحي والمناولة الأولى، الشبيبة، الجوقات وحياة الرعية منذ عام ١٩٧٥.',
+    eyebrow: 'كنيسة كلدانية كاثوليكية · وارن، ميشيغان',
+    h1a: 'عودوا إلى البيت،',
+    h1b: 'إلى قلب يسوع',
+    lede: 'منذ خمسين عاماً، تحافظ كنيسة القلب الأقدس على إيماننا الكلداني حيّاً: نصلّي الطقس العريق بلغة المسيح، ونربّي أطفالنا في الكنيسة، ونجتمع كعائلة واحدة.',
+    stats: [['١٩٧٥', 'في خدمة جاليتنا منذ'], ['٣', 'لغات للصلاة: السورث والعربية والإنجليزية'], ['١٣', 'خدمة يمكنك الانضمام إليها']],
+    weekEyebrow: 'انضمّوا إلينا حول المذبح',
+    weekTitle: 'هذا الأسبوع في القلب الأقدس',
+    weekLede: 'الاعتراف يومي الجمعة والسبت من ٤ إلى ٥ مساءً، يليه السجود للقربان والمسبحة الوردية قبل القداس.',
+    weekLink: 'البرنامج الكامل والأسرار',
+    aboutEyebrow: 'قصّتنا',
+    aboutTitle: 'كنيسة بناها أبناؤها، لأبنائها',
+    aboutP1: 'تأسّست كنيسة القلب الأقدس عام ١٩٧٥ في قلب الحيّ الكلداني في ديترويت. ومع وصول العائلات من العراق، وكثير منها لاجئون، ساعدتهم هذه الرعية على التمسّك بإيمانهم، ووحّدت جاليتنا الكلدانية وأبقتنا معاً.',
+    aboutP2: 'واليوم بيتنا الرعوي في شارع ديكوندر في وارن، حيث تصلّي ثلاثة أجيال جنباً إلى جنب بالسورث والعربية والإنجليزية.',
+    aboutLink: 'اقرأ قصّتنا',
+    catEyebrow: 'التسجيل مفتوح · ٢٠٢٦–٢٠٢٧',
+    catTitle: 'التعليم المسيحي والمناولة الأولى',
+    catText: 'صفوف من مرحلة ما قبل المدرسة حتى الصف الثامن، وتحضير للمناولة الأولى من الصف الثالث فما فوق. يتعلّم أطفالنا الإيمان وتقاليدنا الكلدانية والصلوات بالسورث والإنجليزية.',
+    catFacts: [['calendar', 'السبت · ١٠:٠٠ صباحاً – ١:٣٠ ظهراً'], ['cross', 'يشمل قداس الساعة ١٢:٣٠ بالإنجليزية'], ['pin', 'التسجيل في مكتب الكنيسة، الاثنين – الجمعة، ٩ صباحاً – ٤ مساءً']],
+    catCta: 'استفسر عن التسجيل',
+    minEyebrow: 'شارك معنا',
+    minTitle: 'لك مكان هنا',
+    minLede: 'لا عمر صغير جداً ولا كبير جداً. الجميع مدعوّون للخدمة، وكل خدمة ترحّب بك بأذرع مفتوحة.',
+    minAll: 'عرض جميع الخدمات الـ١٣',
+    verse: 'تَعَالَوْا إِلَيَّ يَا جَمِيعَ الْمُتْعَبِينَ وَالثَّقِيلِي الأَحْمَالِ، وَأَنَا أُرِيحُكُمْ... لأَنِّي وَدِيعٌ وَمُتَوَاضِعُ الْقَلْبِ.',
+    verseRef: 'متى ١١: ٢٨–٢٩',
+    evEyebrow: 'حياة الرعية',
+    evTitle: 'قريباً في القلب الأقدس',
+    evAll: 'جميع المناسبات',
+    evEmptyTitle: 'على مدار السنة في القلب الأقدس',
+    igEyebrow: 'تابعونا',
+    igTitle: 'الحياة في القلب الأقدس',
+    igText: 'تُنشر إعلانات الأعياد وأمسيات الشبيبة وصور القداديس على إنستغرام أولاً.',
+    visitEyebrow: 'خطّط لزيارتك',
+    visitTitle: 'يسعدنا أن نتعرّف عليك',
+    visitText: 'سواء كنت جديداً في وارن، أو عائداً إلى الكنيسة، أو تزور عائلتك، فأنت مرحّب بك في كل قداس. مرّ على المكتب أو عرّفنا بنفسك بعد القداس. يسعدنا أن نعرف اسمك.',
+    officeHours: 'ساعات المكتب',
+  },
+}[lang];
+
+// Build-time default; the browser re-checks on load (see scripts/events.ts).
+const isUpcoming = (e: { start: string; end?: string }) => new Date((e.end ?? e.start).slice(0, 10) + 'T23:59:59').getTime() >= Date.now();
+const upcomingCount = events.filter(isUpcoming).length;
+
+const igPhotos = [
+  '/images/ig/exaltation-reel.webp', '/images/bells-choir-2.webp', '/images/youth-5.webp',
+  '/images/ig/corpus-christi-reel.webp', '/images/choir-group.webp', '/images/youth-9.webp',
+];
+---
+<Base lang={lang} description={c.metaDesc}>
+  <!-- HERO -->
+  <section class="hero grain">
+    <div class="wrap hero-grid">
+      <div class="hero-copy">
+        <p class="eyebrow">{c.eyebrow}</p>
+        <h1><span>{c.h1a}</span> <em>{c.h1b}</em></h1>
+        <p class="lede">{c.lede}</p>
+        <div class="btn-row">
+          <a class="btn" href={href(routes.mass, lang)}><Icon name="clock" /> {t(lang, 'cta.massTimes')}</a>
+          <a class="btn btn-ghost" href={href(routes.contact, lang) + '#signup'}>{t(lang, 'cta.getInvolved')} <Icon name="arrow" class="dir" /></a>
+        </div>
+        <dl class="stats">
+          {c.stats.map(([n, l]) => <div><dt>{l}</dt><dd>{n}</dd></div>)}
+        </dl>
+      </div>
+      <div class="hero-art">
+        <div class="arch hero-arch">
+          <div class="arch-inner"><img src="/images/sacred-heart-painting.webp" alt={lang === 'en' ? 'Painting of the Sacred Heart of Jesus, crowned with thorns and aflame with love' : 'لوحة قلب يسوع الأقدس، مكلّلاً بالشوك ومتّقداً بالحب'} width="960" height="956" fetchpriority="high" /></div>
+        </div>
+        <div class="hero-float card">
+          <Cross size={18} />
+          <div>
+            <strong>{lang === 'en' ? 'Sunday Mass' : 'قداس الأحد'}</strong>
+            <span>{lang === 'en' ? '10 AM Arabic · 12:30 PM Sureth' : '١٠ صباحاً عربي · ١٢:٣٠ ظهراً سورث'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WEEKLY SCHEDULE -->
+  <section class="section bg-burgundy week-band" id="schedule">
+    <div class="wrap">
+      <div class="section-head split reveal">
+        <div>
+          <p class="eyebrow">{c.weekEyebrow}</p>
+          <h2>{c.weekTitle}</h2>
+          <p class="lede">{c.weekLede}</p>
+        </div>
+        <a class="btn btn-ghost" href={href(routes.mass, lang)}>{c.weekLink} <Icon name="arrow" class="dir" /></a>
+      </div>
+      <div class="reveal"><ScheduleWeek lang={lang} variant="dark" /></div>
+    </div>
+  </section>
+
+  <!-- ABOUT TEASER -->
+  <section class="section">
+    <div class="wrap about-grid">
+      <div class="about-img reveal">
+        <img src="/images/sanctuary-about.webp" alt={lang === 'en' ? 'Parishioners at Mass in the Sacred Heart sanctuary' : 'المؤمنون في القداس داخل كنيسة القلب الأقدس'} loading="lazy" width="1564" height="1064" />
+        <div class="about-seal"><span>{lang === 'en' ? 'Est.' : 'تأسست'}</span><strong>{lang === 'en' ? '1975' : '١٩٧٥'}</strong></div>
+      </div>
+      <div class="reveal">
+        <p class="eyebrow">{c.aboutEyebrow}</p>
+        <h2>{c.aboutTitle}</h2>
+        <div class="prose"><p>{c.aboutP1}</p><p>{c.aboutP2}</p></div>
+        <a class="link-arrow" href={href(routes.about, lang)}>{c.aboutLink} <Icon name="arrow" size={18} /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATECHISM CALLOUT -->
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="cat card reveal">
+        <div class="cat-copy">
+          <span class="badge badge-gold"><Icon name="star" size={14} /> {c.catEyebrow}</span>
+          <h2>{c.catTitle}</h2>
+          <p>{c.catText}</p>
+          <ul class="cat-facts">
+            {c.catFacts.map(([i, txt]) => <li><Icon name={i as 'calendar'} size={18} /> {txt}</li>)}
+          </ul>
+          <div class="btn-row">
+            <a class="btn" href={href(routes.contact, lang) + '?interest=catechism#signup'}>{c.catCta}</a>
+            <a class="btn btn-ghost" href={href('/ministries/catechism', lang)}>{t(lang, 'cta.learnMore')}</a>
+          </div>
+        </div>
+        <div class="cat-img">
+          <img src="/images/ig/catechism-flyer.webp" alt={lang === 'en' ? 'First Communion & Catechism registration flyer' : 'إعلان التسجيل في التعليم المسيحي والمناولة الأولى'} loading="lazy" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINISTRIES -->
+  <section class="section">
+    <div class="wrap">
+      <div class="section-head center reveal">
+        <p class="eyebrow">{c.minEyebrow}</p>
+        <h2>{c.minTitle}</h2>
+        <p class="lede">{c.minLede}</p>
+      </div>
+      <div class="grid grid-3">
+        {featured.map((m) => <div class="reveal"><MinistryCard m={m} lang={lang} /></div>)}
+      </div>
+      <div class="center more">
+        <a class="btn btn-ghost" href={href(routes.ministries, lang)}>{c.minAll} <Icon name="arrow" class="dir" /></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- VERSE -->
+  <section class="section bg-burgundy verse-band">
+    <img class="verse-bg" src="/images/hero-sacred-heart-wide.webp" alt="" aria-hidden="true" loading="lazy" />
+    <div class="wrap verse reveal">
+      <div class="divider"><Cross /></div>
+      <blockquote>“{c.verse}”</blockquote>
+      <cite>{c.verseRef}</cite>
+    </div>
+  </section>
+
+  <!-- EVENTS -->
+  <section class="section bg-paper" data-events-root data-limit="3">
+    <div class="wrap">
+      <div class="section-head split reveal">
+        <div>
+          <p class="eyebrow">{c.evEyebrow}</p>
+          <h2>{c.evTitle}</h2>
+        </div>
+        <a class="btn btn-ghost" href={href(routes.events, lang)}>{c.evAll} <Icon name="arrow" class="dir" /></a>
+      </div>
+      <ul class="grid grid-3 plain" data-upcoming hidden={upcomingCount === 0}>
+        {events.map((e) => <li hidden={!isUpcoming(e)}><EventCard event={e} lang={lang} /></li>)}
+      </ul>
+      <div data-upcoming-empty hidden={upcomingCount > 0}>
+        <div class="empty-note card">
+          <span class="en-icon"><Icon name="instagram" size={24} /></span>
+          <p>{t(lang, 'events.none')}</p>
+          <a class="btn btn-sm" href={site.social.instagram} target="_blank" rel="noopener">{site.social.instagramHandle}</a>
+        </div>
+        <h3 class="trad-title">{c.evEmptyTitle}</h3>
+        <ol class="trad-strip">
+          {traditions.map((tr) => (
+            <li>
+              <span class="trad-month">{tr.month[lang]}</span>
+              <strong>{tr.title[lang]}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM -->
+  <section class="section ig-band">
+    <div class="wrap ig-grid">
+      <div class="ig-copy reveal">
+        <p class="eyebrow">{c.igEyebrow}</p>
+        <h2>{c.igTitle}</h2>
+        <p class="lede">{c.igText}</p>
+        <div class="btn-row">
+          <a class="btn" href={site.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" /> {site.social.instagramHandle}</a>
+          <a class="btn btn-ghost" href={site.social.facebook} target="_blank" rel="noopener"><Icon name="facebook" /> Facebook</a>
+        </div>
+      </div>
+      <a class="ig-photos reveal" href={site.social.instagram} target="_blank" rel="noopener" aria-label={t(lang, 'cta.follow')}>
+        {igPhotos.map((p) => <img src={p} alt="" loading="lazy" />)}
+      </a>
+    </div>
+  </section>
+
+  <!-- VISIT -->
+  <section class="section bg-cream-2 grain">
+    <div class="wrap visit-grid">
+      <div class="reveal">
+        <p class="eyebrow">{c.visitEyebrow}</p>
+        <h2>{c.visitTitle}</h2>
+        <p class="lede">{c.visitText}</p>
+        <ul class="visit-list">
+          <li><Icon name="pin" /> <div><strong>{site.address.street}</strong><span>{site.address.city}, {site.address.state} {site.address.zip}</span></div></li>
+          <li><Icon name="phone" /> <div><strong dir="ltr"><a href={`tel:${site.phone.tel}`}>{site.phone.display}</a></strong><span>{t(lang, 'footer.office')}</span></div></li>
+          <li><Icon name="clock" /> <div><strong>{site.officeHours[lang]}</strong><span>{c.officeHours}</span></div></li>
+        </ul>
+        <div class="btn-row">
+          <a class="btn" href={site.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" /> {t(lang, 'cta.directions')}</a>
+          <a class="btn btn-ghost" href={href(routes.contact, lang)}>{t(lang, 'nav.contact')}</a>
+        </div>
+      </div>
+      <div class="map card reveal">
+        <iframe title={lang === 'en' ? 'Map to Sacred Heart Chaldean Catholic Church' : 'خريطة الوصول إلى الكنيسة'} src={site.mapsEmbed} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  import { sortEvents } from '../scripts/events';
+  sortEvents();
+</script>
+
+<style>
+  /* Hero */
+  .hero { padding: clamp(40px, 6vw, 88px) 0 clamp(56px, 7vw, 104px); background: radial-gradient(900px 600px at 80% 20%, rgba(212, 173, 95, 0.22), transparent 60%), var(--cream); }
+  .hero-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(32px, 6vw, 88px); align-items: center; }
+  h1 { font-size: clamp(2.8rem, 6.4vw, 5.2rem); line-height: 1.02; margin-bottom: 0.4em; }
+  h1 span { display: block; font-weight: 500; color: var(--ink-2); font-size: 0.62em; margin-bottom: 0.1em; }
+  h1 em { font-style: italic; color: var(--burgundy); display: block; }
+  :global(html[lang='ar']) h1 { line-height: 1.35; }
+  :global(html[lang='ar']) h1 em { font-style: normal; }
+  .hero .lede { margin-bottom: 1.8rem; }
+  .stats { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: 12px 36px; margin: 2.6rem 0 0; padding-top: 1.6rem; border-top: 1px solid var(--line-gold); }
+  .stats div { display: flex; flex-direction: column; }
+  .stats dd { order: -1; }
+  .stats dd { margin: 0; font-family: var(--serif); font-size: 2.4rem; font-weight: 700; color: var(--burgundy); line-height: 1; }
+  .stats dt { font-size: 0.85rem; color: var(--muted); max-width: 17ch; line-height: 1.35; margin-top: 6px; }
+  .hero-art { position: relative; justify-self: center; width: min(100%, 460px); }
+  .hero-arch { aspect-ratio: 4 / 5.2; }
+  .hero-arch img { object-position: 50% 45%; }
+  .hero-art::before {
+    content: ''; position: absolute; inset: -8% -10% auto; height: 70%; z-index: -1;
+    background: radial-gradient(circle, rgba(212, 173, 95, 0.55), transparent 65%); filter: blur(20px);
+  }
+  .hero-float {
+    position: absolute; inset-inline-start: -28px; bottom: 36px; display: flex; gap: 12px; align-items: center;
+    padding: 14px 18px; border-radius: 16px; box-shadow: var(--shadow-lg); color: var(--gold);
+  }
+  .hero-float strong { display: block; color: var(--burgundy-deep); font-size: 1rem; }
+  .hero-float span { display: block; font-size: 0.88rem; color: var(--muted); }
+
+  /* Week */
+  .week-band .section-head .lede { margin-bottom: 0; }
+
+  /* About */
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 6vw, 80px); align-items: center; }
+  .about-img { position: relative; }
+  .about-img img { border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); aspect-ratio: 4 / 3.4; object-fit: cover; width: 100%; }
+  .about-seal {
+    position: absolute; inset-inline-end: -18px; bottom: -22px; width: 118px; height: 118px; border-radius: 50%;
+    background: var(--burgundy); color: #fff7e8; display: grid; place-content: center; text-align: center;
+    box-shadow: 0 0 0 6px var(--cream), 0 0 0 7px var(--line-gold), var(--shadow);
+  }
+  .about-seal span { font-family: var(--caps); font-size: 0.72rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-2); }
+  .about-seal strong { font-family: var(--serif); font-size: 2.1rem; line-height: 1; }
+
+  /* Catechism */
+  .cat { display: grid; grid-template-columns: 1.3fr 0.7fr; align-items: stretch; background: linear-gradient(135deg, var(--paper), #fbf3e3); }
+  .cat-copy { padding: clamp(28px, 5vw, 56px); }
+  .cat h2 { margin-top: 14px; }
+  .cat-facts { list-style: none; padding: 0; margin: 0 0 1.6rem; display: grid; gap: 10px; }
+  .cat-facts li { display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); }
+  .cat-facts :global(svg) { color: var(--gold); flex: none; margin-top: 4px; }
+  .cat-img { background: var(--cream-2); display: grid; place-items: center; padding: 24px; border-inline-start: 1px solid var(--line); }
+  .cat-img img { max-height: 440px; width: auto; border-radius: 10px; box-shadow: var(--shadow); transform: rotate(2deg); }
+
+  .more { margin-top: 40px; }
+
+  /* Verse */
+  .verse-band { position: relative; overflow: hidden; }
+  .verse-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.16; filter: blur(2px) saturate(0.8); }
+  .verse-band .verse { position: relative; }
+  .verse-band .divider { color: var(--gold-2); }
+
+  /* Events */
+  .plain { list-style: none; padding: 0; margin: 0; }
+  .empty-note { display: grid; grid-template-columns: auto 1fr auto; gap: 18px; align-items: center; padding: 20px 24px; }
+  .empty-note p { margin: 0; color: var(--ink-2); }
+  .en-icon { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; background: var(--burgundy); color: var(--gold-soft); }
+  @media (max-width: 640px) { .empty-note { grid-template-columns: 1fr; justify-items: start; } }
+  .trad-title { margin-top: 32px; font-size: 1.6rem; }
+  .trad-strip { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .trad-strip li { padding: 16px 18px; border-radius: var(--radius); background: var(--cream); border: 1px solid var(--line); }
+  .trad-month { display: block; font-family: var(--caps); font-size: 0.72rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 4px; }
+  :global(html[lang='ar']) .trad-month { font-size: 0.9rem; letter-spacing: 0; }
+  .trad-strip strong { font-family: var(--serif); font-size: 1.2rem; color: var(--burgundy-deep); line-height: 1.2; display: block; }
+
+  /* Instagram */
+  .ig-grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .ig-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .ig-photos img { aspect-ratio: 1; object-fit: cover; border-radius: 12px; width: 100%; transition: transform 0.4s var(--ease), filter 0.4s; }
+  .ig-photos:hover img { filter: saturate(1.1); }
+  .ig-photos img:hover { transform: scale(1.03); }
+
+  /* Visit */
+  .visit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(32px, 5vw, 72px); align-items: center; }
+  .visit-list { list-style: none; padding: 0; margin: 0 0 1.8rem; display: grid; gap: 16px; }
+  .visit-list li { display: flex; gap: 14px; align-items: flex-start; }
+  .visit-list li > :global(svg) { color: var(--burgundy); margin-top: 4px; flex: none; }
+  .visit-list strong { display: block; font-size: 1.1rem; }
+  .visit-list strong a { color: var(--ink); text-decoration: none; }
+  .visit-list span { color: var(--muted); font-size: 0.95rem; }
+  .map { aspect-ratio: 4 / 3.2; padding: 8px; }
+  .map iframe { width: 100%; height: 100%; border: 0; border-radius: 14px; filter: sepia(0.18) saturate(0.95); }
+
+  @media (max-width: 940px) {
+    .hero-grid, .about-grid, .ig-grid, .visit-grid { grid-template-columns: 1fr; }
+    .hero-art { order: -1; width: min(78%, 380px); }
+    .hero-float { inset-inline-start: -12px; bottom: 20px; }
+    .cat { grid-template-columns: 1fr; }
+    .cat-img { border-inline-start: 0; border-top: 1px solid var(--line); }
+    .cat-img img { max-height: 360px; }
+    .about-seal { inset-inline-end: 12px; }
+  }
+  @media (max-width: 560px) {
+    .stats { grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stats dd { font-size: 1.9rem; }
+    .stats dt { font-size: 0.78rem; }
+    .hero-float { position: relative; inset: auto; margin: -28px auto 0; width: max-content; max-width: 100%; }
+    .ig-photos { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  }
+</style>

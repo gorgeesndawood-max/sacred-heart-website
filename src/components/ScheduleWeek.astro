@@ -1,0 +1,79 @@
+---
+import Icon from './Icon.astro';
+import { schedule, scheduleDays, days, fmtTime, type Lang } from '../data/site';
+import { t } from '../i18n/ui';
+
+interface Props { lang: Lang; variant?: 'light' | 'dark' }
+const { lang, variant = 'light' } = Astro.props;
+const kindIcon = { mass: 'cross', adoration: 'candle', confession: 'heart' } as const;
+---
+<div class={`week ${variant}`} data-week>
+  {scheduleDays.map((d) => (
+    <section class="day" data-day={d} aria-labelledby={`day-${d}`}>
+      <header>
+        <h3 id={`day-${d}`}>{days[d][lang]}</h3>
+        <span class="today-pill" hidden>{lang === 'en' ? 'Today' : 'اليوم'}</span>
+      </header>
+      <ul>
+        {schedule.filter((s) => s.day === d).sort((a, b) => a.time.localeCompare(b.time)).map((s) => (
+          <li class={`svc ${s.kind}`}>
+            <span class="svc-time">{fmtTime(s.time, lang)}</span>
+            <span class="svc-what">
+              <span class="svc-label"><Icon name={kindIcon[s.kind]} size={16} /> {s.label[lang]}</span>
+              {s.lang && <span class="svc-lang">{s.lang[lang]}</span>}
+              {s.note && <span class="svc-note">{s.note[lang]}</span>}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  ))}
+</div>
+
+<style>
+  .week { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(14px, 2vw, 24px); }
+  .day {
+    position: relative; border-radius: var(--radius-lg); padding: 26px 24px 18px;
+    background: var(--paper); border: 1px solid var(--line); box-shadow: var(--shadow-sm);
+  }
+  .day::before { content: ''; position: absolute; inset: 0 24px auto; height: 3px; border-radius: 0 0 4px 4px; background: linear-gradient(90deg, var(--gold-2), var(--gold)); }
+  .day.is-today { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212, 173, 95, 0.25), var(--shadow); }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  h3 { margin: 0; font-size: 1.7rem; }
+  .today-pill { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--burgundy); color: #fff; padding: 3px 10px; border-radius: 999px; }
+  ul { list-style: none; margin: 0; padding: 0; }
+  .svc { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 14px 0; border-top: 1px dashed var(--line); }
+  .svc:first-child { border-top: 0; }
+  :global(html[lang='ar']) .svc { grid-template-columns: 110px 1fr; }
+  .svc-time { font-family: var(--serif); font-weight: 700; font-size: 1.3rem; color: var(--burgundy); line-height: 1.2; white-space: nowrap; }
+  .svc-what { display: flex; flex-direction: column; gap: 2px; }
+  .svc-label { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; color: var(--ink); }
+  .svc-label :global(svg) { color: var(--gold); flex: none; }
+  .svc-lang { font-size: 0.92rem; color: var(--muted); }
+  .svc-note { font-size: 0.85rem; color: var(--burgundy); font-style: italic; }
+  .svc.mass .svc-time { font-size: 1.5rem; }
+  .svc:not(.mass) .svc-time { color: var(--muted); font-size: 1.15rem; }
+
+  .dark .day { background: rgba(255, 248, 236, 0.05); border-color: rgba(234, 215, 168, 0.22); box-shadow: none; }
+  .dark h3 { color: #fff7e8; }
+  .dark .svc { border-color: rgba(234, 215, 168, 0.18); }
+  .dark .svc-time { color: var(--gold-soft); }
+  .dark .svc:not(.mass) .svc-time { color: #cdb893; }
+  .dark .svc-label { color: #fff7e8; }
+  .dark .svc-lang { color: #d7c3a3; }
+  .dark .svc-note { color: var(--gold-2); }
+  .dark .day.is-today { border-color: var(--gold-2); box-shadow: 0 0 0 3px rgba(212, 173, 95, 0.2); }
+
+  @media (max-width: 860px) { .week { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  // Highlight today's column (Detroit time).
+  const wd = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Detroit', weekday: 'short' }).format(new Date());
+  const idx = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(wd);
+  document.querySelectorAll<HTMLElement>(`[data-week] [data-day="${idx}"]`).forEach((el) => {
+    el.classList.add('is-today');
+    const pill = el.querySelector<HTMLElement>('.today-pill');
+    if (pill) pill.hidden = false;
+  });
+</script>

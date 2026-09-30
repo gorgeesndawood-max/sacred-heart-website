@@ -1,0 +1,116 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import MinistryCard from '../components/MinistryCard.astro';
+import Icon from '../components/Icon.astro';
+import { type Lang } from '../data/site';
+import { ministries, categories, type Category } from '../data/ministries';
+import { href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const order: Category[] = ['formation', 'youth', 'music', 'prayer', 'altar', 'care'];
+
+const c = {
+  en: {
+    title: 'Ministries',
+    desc: 'Get involved at Sacred Heart Chaldean Church: Catechism, Mom Group, Super Saints youth group, Bells Choir, Arabic & Chaldean Choir, Aramaic class, prayer groups, altar servers and more.',
+    eyebrow: 'Dedication & Passion',
+    h1: 'Serve with us',
+    lede: 'We are all called to serve our Lord in different ways. No age is too young or too old: everyone is called, and every position is open with open arms.',
+    weekTitle: 'Our week at a glance',
+    week: [
+      ['Tuesday', '6:00 PM', 'Aramaic / Chaldean Class'],
+      ['Tuesday', '7:30 PM', 'Arabic & Chaldean Choir practice'],
+      ['Thursday', '7:00 PM', 'Bells Choir practice'],
+      ['Saturday', '10:00 AM', 'Catechism & First Communion'],
+      ['Saturday', '5:00 PM', 'Our Lady of Perpetual Help prayer group'],
+    ],
+    howTitle: 'How to join',
+    how: 'Use the sign-up form and tell us which ministry interests you, stop by the parish office, or speak to a parish council member after Sunday Mass.',
+    howCta: 'Sign up online',
+  },
+  ar: {
+    title: 'الخدمات',
+    desc: 'شارك في كنيسة القلب الأقدس الكلدانية: التعليم المسيحي، مجموعة الأمهات، شبيبة سوبر سينتس، جوقة الأجراس، الجوقة العربية والكلدانية، صف الآرامية، الأخويات، خدّام المذبح وغيرها.',
+    eyebrow: 'تكرّس وشغف',
+    h1: 'اخدم معنا',
+    lede: 'كلّنا مدعوّون لخدمة ربّنا بطرق مختلفة. لا عمر صغير جداً ولا كبير جداً: الجميع مدعوّون، وكل الخدمات مفتوحة لك بأذرع مفتوحة.',
+    weekTitle: 'أسبوعنا في لمحة',
+    week: [
+      ['الثلاثاء', '٦:٠٠ مساءً', 'صف اللغة الآرامية / الكلدانية'],
+      ['الثلاثاء', '٧:٣٠ مساءً', 'تدريب الجوقة العربية والكلدانية'],
+      ['الخميس', '٧:٠٠ مساءً', 'تدريب جوقة الأجراس'],
+      ['السبت', '١٠:٠٠ صباحاً', 'التعليم المسيحي والمناولة الأولى'],
+      ['السبت', '٥:٠٠ مساءً', 'أخوية سيدة المعونة الدائمة'],
+    ],
+    howTitle: 'كيف تنضمّ',
+    how: 'استخدم نموذج التسجيل وأخبرنا بالخدمة التي تهمّك، أو مرّ على مكتب الكنيسة، أو تحدّث مع أحد أعضاء المجلس الخورني بعد قداس الأحد.',
+    howCta: 'سجّل عبر الإنترنت',
+  },
+}[lang];
+---
+<Base lang={lang} title={c.title} description={c.desc} image="/images/bells-choir-2.webp">
+  <PageHero lang={lang} eyebrow={c.eyebrow} title={c.h1} lede={c.lede} image="/images/bells-choir-2.webp">
+    <nav class="cat-jump" aria-label={c.title}>
+      {order.map((k) => <a href={`#${k}`}>{categories[k][lang]}</a>)}
+    </nav>
+  </PageHero>
+
+  <section class="section-tight">
+    <div class="wrap glance-grid">
+      <div class="glance card reveal">
+        <h2>{c.weekTitle}</h2>
+        <ul>
+          {c.week.map(([d, tm, what]) => <li><span class="g-day">{d}</span><span class="g-time">{tm}</span><span class="g-what">{what}</span></li>)}
+        </ul>
+      </div>
+      <div class="how card reveal">
+        <Icon name="users" size={34} />
+        <h2>{c.howTitle}</h2>
+        <p>{c.how}</p>
+        <a class="btn btn-gold" href={href(routes.contact, lang) + '#signup'}>{c.howCta} <Icon name="arrow" class="dir" /></a>
+      </div>
+    </div>
+  </section>
+
+  {order.map((k, i) => (
+    <section class={`section-tight ${i % 2 ? 'bg-paper' : ''}`} id={k}>
+      <div class="wrap">
+        <h2 class="cat-title reveal">{categories[k][lang]}</h2>
+        <div class="grid grid-3">
+          {ministries.filter((m) => m.category === k).map((m) => <div class="reveal"><MinistryCard m={m} lang={lang} /></div>)}
+        </div>
+      </div>
+    </section>
+  ))}
+  <div class="pad"></div>
+</Base>
+
+<style>
+  .cat-jump { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 28px; }
+  .cat-jump a { padding: 8px 16px; border-radius: 999px; border: 1px solid rgba(234, 215, 168, 0.4); color: #fff7e8 !important; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
+  .cat-jump a:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--gold-2); }
+  .glance-grid { display: grid; grid-template-columns: 1.4fr 0.6fr; gap: clamp(16px, 2.4vw, 28px); }
+  .glance { padding: clamp(24px, 4vw, 40px); }
+  .glance h2, .how h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); }
+  .glance ul { list-style: none; margin: 0; padding: 0; }
+  .glance li { display: grid; grid-template-columns: 110px 110px 1fr; gap: 12px; padding: 12px 0; border-top: 1px dashed var(--line); align-items: baseline; }
+  .g-day { font-weight: 700; color: var(--burgundy); }
+  .g-time { font-family: var(--serif); font-weight: 700; font-size: 1.2rem; color: var(--ink); }
+  .g-what { color: var(--ink-2); }
+  .how { padding: clamp(24px, 4vw, 40px); background: var(--burgundy-deep); color: #ecdcc2; border-color: transparent; display: flex; flex-direction: column; align-items: flex-start; }
+  .how :global(svg:first-child) { color: var(--gold-2); margin-bottom: 12px; }
+  .how h2 { color: #fff7e8; }
+  .how p { flex: 1; }
+  .cat-title { font-size: clamp(1.8rem, 3vw, 2.4rem); display: flex; align-items: center; gap: 16px; margin-bottom: 28px; }
+  .cat-title::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line-gold), transparent); }
+  :global([dir='rtl']) .cat-title::after { background: linear-gradient(270deg, var(--line-gold), transparent); }
+  .pad { height: clamp(40px, 6vw, 80px); }
+  @media (max-width: 900px) { .glance-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 560px) {
+    .glance li { grid-template-columns: 1fr auto; }
+    .g-what { grid-column: 1 / -1; }
+  }
+</style>

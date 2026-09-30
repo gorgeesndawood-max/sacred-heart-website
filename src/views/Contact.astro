@@ -1,0 +1,327 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import { site, type Lang } from '../data/site';
+import { ministries } from '../data/ministries';
+import { t, href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const c = {
+  en: {
+    title: 'Contact & Sign Up',
+    desc: 'Contact Sacred Heart Chaldean Catholic Church in Warren, MI, or sign up for Catechism, Mom Group, Super Saints, choirs and other ministries.',
+    eyebrow: 'We would love to hear from you',
+    lede: 'Have a question, want to register your child for Catechism, or ready to join a ministry? Send us a note and someone from the parish will get back to you.',
+    formTitle: 'Send us a message',
+    formSub: 'Fields marked * are required.',
+    name: 'Full name', email: 'Email', phone: 'Phone', interest: "I'm reaching out about",
+    general: 'A general question', sacrament: 'A sacrament (Baptism, Marriage, Anointing…)', other: 'Something else',
+    groupMin: 'Join a ministry', groupOther: 'Other',
+    childName: "Child's name", grade: 'Grade (2026–27)', gradePick: 'Select grade', prek: 'Pre-school', k: 'Kindergarten',
+    childNote: 'Registration is completed in person at the office. We will contact you with next steps.',
+    message: 'Message', messagePh: 'How can we help?',
+    contactPref: 'Best way to reach you', prefEmail: 'Email', prefPhone: 'Phone call', prefText: 'Text message',
+    send: 'Send message', sending: 'Sending…',
+    okTitle: 'Thank you! Your message was sent.',
+    okText: 'Someone from the parish will be in touch soon. God bless you!',
+    errText: 'Sorry, something went wrong. Please try again, or call the office at',
+    another: 'Send another message',
+    privacy: 'We use your information only to respond to you. It is never shared or sold.',
+    officeTitle: 'Parish Office',
+    visit: 'Visit', call: 'Call', emailUs: 'Email', fax: 'Fax', hours: 'Office hours', pastor: 'Pastor',
+    urgent: 'For a pastoral emergency (someone seriously ill or dying), please call the office rather than using this form.',
+  },
+  ar: {
+    title: 'تواصل وسجّل',
+    desc: 'تواصل مع كنيسة القلب الأقدس الكلدانية الكاثوليكية في وارن، أو سجّل في التعليم المسيحي ومجموعة الأمهات وشبيبة سوبر سينتس والجوقات وغيرها من الخدمات.',
+    eyebrow: 'يسعدنا أن نسمع منك',
+    lede: 'لديك سؤال، أو تريد تسجيل طفلك في التعليم المسيحي، أو مستعدّ للانضمام إلى خدمة؟ أرسل لنا رسالة وسيتواصل معك أحد أبناء الرعية.',
+    formTitle: 'أرسل لنا رسالة',
+    formSub: 'الحقول المشار إليها بـ * مطلوبة.',
+    name: 'الاسم الكامل', email: 'البريد الإلكتروني', phone: 'رقم الهاتف', interest: 'أتواصل بخصوص',
+    general: 'سؤال عام', sacrament: 'سرّ من الأسرار (معمودية، زواج، مسحة المرضى…)', other: 'أمر آخر',
+    groupMin: 'الانضمام إلى خدمة', groupOther: 'أخرى',
+    childName: 'اسم الطفل', grade: 'الصف (٢٠٢٦–٢٧)', gradePick: 'اختر الصف', prek: 'ما قبل المدرسة', k: 'الروضة',
+    childNote: 'يُستكمل التسجيل شخصياً في المكتب. سنتواصل معك بالخطوات التالية.',
+    message: 'الرسالة', messagePh: 'كيف يمكننا مساعدتك؟',
+    contactPref: 'أفضل طريقة للتواصل معك', prefEmail: 'البريد الإلكتروني', prefPhone: 'اتصال هاتفي', prefText: 'رسالة نصية',
+    send: 'أرسل الرسالة', sending: 'جارٍ الإرسال…',
+    okTitle: 'شكراً لك! تم إرسال رسالتك.',
+    okText: 'سيتواصل معك أحد أبناء الرعية قريباً. بارككم الرب!',
+    errText: 'عذراً، حدث خطأ ما. يرجى المحاولة مرة أخرى، أو الاتصال بالمكتب على',
+    another: 'إرسال رسالة أخرى',
+    privacy: 'نستخدم معلوماتك فقط للردّ عليك. لا نشاركها ولا نبيعها أبداً.',
+    officeTitle: 'مكتب الكنيسة',
+    visit: 'العنوان', call: 'الهاتف', emailUs: 'البريد الإلكتروني', fax: 'الفاكس', hours: 'ساعات المكتب', pastor: 'كاهن الرعية',
+    urgent: 'في حالة طارئة رعوية (مريض بحالة خطرة أو على فراش الموت)، يرجى الاتصال بالمكتب بدلاً من استخدام هذا النموذج.',
+  },
+}[lang];
+
+const grades = [c.prek, c.k, ...Array.from({ length: 8 }, (_, i) => (lang === 'en' ? `Grade ${i + 1}` : `الصف ${'١٢٣٤٥٦٧٨'[i]}`))];
+---
+<Base lang={lang} title={c.title} description={c.desc}>
+  <PageHero lang={lang} eyebrow={c.eyebrow} title={c.title} lede={c.lede} image="/images/sanctuary-full.webp" />
+
+  <section class="section-tight" id="signup">
+    <div class="wrap contact-grid">
+      <div class="form-card card">
+        <form id="contact-form" novalidate data-endpoint={`https://formsubmit.co/ajax/${site.formInbox}`} data-lang={lang}>
+          <h2>{c.formTitle}</h2>
+          <p class="form-sub">{c.formSub}</p>
+
+          <div class="row">
+            <label class="field">
+              <span>{c.name} *</span>
+              <input name="name" type="text" autocomplete="name" required />
+              <em class="err">{lang === 'en' ? 'Please enter your name.' : 'يرجى إدخال اسمك.'}</em>
+            </label>
+          </div>
+          <div class="row two">
+            <label class="field">
+              <span>{c.email} *</span>
+              <input name="email" type="email" autocomplete="email" required dir="ltr" />
+              <em class="err">{lang === 'en' ? 'Please enter a valid email.' : 'يرجى إدخال بريد إلكتروني صحيح.'}</em>
+            </label>
+            <label class="field">
+              <span>{c.phone}</span>
+              <input name="phone" type="tel" autocomplete="tel" inputmode="tel" dir="ltr" />
+            </label>
+          </div>
+
+          <label class="field">
+            <span>{c.interest} *</span>
+            <select name="interest" required data-interest>
+              <option value="general">{c.general}</option>
+              <optgroup label={c.groupMin}>
+                {ministries.map((m) => <option value={m.slug}>{m.name[lang]}</option>)}
+              </optgroup>
+              <optgroup label={c.groupOther}>
+                <option value="sacrament">{c.sacrament}</option>
+                <option value="other">{c.other}</option>
+              </optgroup>
+            </select>
+          </label>
+
+          <fieldset class="child" data-child hidden>
+            <legend><Icon name="book" size={18} /> {lang === 'en' ? 'Catechism details' : 'تفاصيل التعليم المسيحي'}</legend>
+            <div class="row two">
+              <label class="field">
+                <span>{c.childName}</span>
+                <input name="child_name" type="text" />
+              </label>
+              <label class="field">
+                <span>{c.grade}</span>
+                <select name="child_grade">
+                  <option value="">{c.gradePick}</option>
+                  {grades.map((g) => <option>{g}</option>)}
+                </select>
+              </label>
+            </div>
+            <p class="hint"><Icon name="info" size={16} /> {c.childNote}</p>
+          </fieldset>
+
+          <label class="field">
+            <span>{c.message}</span>
+            <textarea name="message" rows="5" placeholder={c.messagePh}></textarea>
+          </label>
+
+          <fieldset class="pref">
+            <legend>{c.contactPref}</legend>
+            <label><input type="radio" name="contact_preference" value="Email" checked /> {c.prefEmail}</label>
+            <label><input type="radio" name="contact_preference" value="Phone call" /> {c.prefPhone}</label>
+            <label><input type="radio" name="contact_preference" value="Text message" /> {c.prefText}</label>
+          </fieldset>
+
+          <!-- spam trap: real people never see or fill this -->
+          <input type="text" name="_honey" class="honey" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+          <button class="btn submit" type="submit" data-label={c.send} data-sending={c.sending}>{c.send} <Icon name="arrow" class="dir" /></button>
+          <p class="privacy"><Icon name="shield" size={16} /> {c.privacy}</p>
+          <p class="form-error" role="alert" hidden>{c.errText} <a href={`tel:${site.phone.tel}`} dir="ltr">{site.phone.display}</a>.</p>
+        </form>
+
+        <div class="success" data-success hidden tabindex="-1">
+          <div class="success-icon"><Icon name="check" size={36} /></div>
+          <h2>{c.okTitle}</h2>
+          <p>{c.okText}</p>
+          <button type="button" class="btn btn-ghost" data-again>{c.another}</button>
+        </div>
+      </div>
+
+      <aside class="office">
+        <div class="office-card bg-burgundy">
+          <h2>{c.officeTitle}</h2>
+          <ul>
+            <li><Icon name="pin" /><div><span>{c.visit}</span><a href={site.mapsUrl} target="_blank" rel="noopener" dir="ltr">{site.address.street}<br />{site.address.city}, {site.address.state} {site.address.zip}</a></div></li>
+            <li><Icon name="phone" /><div><span>{c.call}</span><a href={`tel:${site.phone.tel}`} dir="ltr">{site.phone.display}</a></div></li>
+            <li><Icon name="mail" /><div><span>{c.emailUs}</span><a href={`mailto:${site.email}`}>{site.email}</a></div></li>
+            <li><Icon name="clock" /><div><span>{c.hours}</span><strong>{site.officeHours[lang]}</strong></div></li>
+            <li><Icon name="cross" /><div><span>{c.pastor}</span><strong>{site.pastor[lang]}</strong></div></li>
+            <li><Icon name="info" /><div><span>{c.fax}</span><strong dir="ltr">{site.fax}</strong></div></li>
+          </ul>
+          <div class="social">
+            <a class="btn btn-ghost btn-sm" href={site.social.instagram} target="_blank" rel="noopener"><Icon name="instagram" /> Instagram</a>
+            <a class="btn btn-ghost btn-sm" href={site.social.facebook} target="_blank" rel="noopener"><Icon name="facebook" /> Facebook</a>
+          </div>
+        </div>
+        <p class="urgent"><Icon name="heart" size={18} /> {c.urgent}</p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="map card">
+        <iframe title={lang === 'en' ? 'Map to Sacred Heart Chaldean Catholic Church' : 'خريطة الوصول إلى الكنيسة'} src={site.mapsEmbed} loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+      <div class="center map-cta"><a class="btn" href={site.mapsUrl} target="_blank" rel="noopener"><Icon name="pin" /> {t(lang, 'cta.directions')}</a></div>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('#contact-form');
+  const interest = document.querySelector<HTMLSelectElement>('[data-interest]');
+  const child = document.querySelector<HTMLFieldSetElement>('[data-child]');
+  const success = document.querySelector<HTMLElement>('[data-success]');
+  const errorBox = form?.querySelector<HTMLElement>('.form-error');
+
+  // Pre-select from ?interest=slug (links on ministry pages).
+  const pre = new URLSearchParams(location.search).get('interest');
+  if (interest && pre && [...interest.options].some((o) => o.value === pre)) interest.value = pre;
+  const syncChild = () => { if (child && interest) child.hidden = interest.value !== 'catechism'; };
+  interest?.addEventListener('change', syncChild);
+  syncChild();
+
+  const validate = () => {
+    if (!form) return false;
+    let ok = true;
+    form.querySelectorAll<HTMLInputElement>('input[required]').forEach((el) => {
+      const valid = el.value.trim() !== '' && (el.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()));
+      el.closest('.field')?.classList.toggle('invalid', !valid);
+      if (!valid && ok) { el.focus(); ok = false; }
+    });
+    return ok;
+  };
+  form?.querySelectorAll('input[required]').forEach((el) =>
+    el.addEventListener('input', () => el.closest('.field')?.classList.remove('invalid')));
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+    const btn = form.querySelector<HTMLButtonElement>('.submit');
+    const fd = new FormData(form);
+    if (fd.get('_honey')) return;
+    const interestLabel = interest?.selectedOptions[0]?.text ?? '';
+    const payload: Record<string, string> = {
+      _subject: `Website: ${interestLabel} (${fd.get('name')})`,
+      _template: 'table',
+      _captcha: 'false',
+      Name: String(fd.get('name') ?? ''),
+      Email: String(fd.get('email') ?? ''),
+      Phone: String(fd.get('phone') ?? ''),
+      'Reaching out about': interestLabel,
+      'Preferred contact': String(fd.get('contact_preference') ?? ''),
+      Message: String(fd.get('message') ?? ''),
+      'Site language': form.dataset.lang === 'ar' ? 'Arabic' : 'English',
+      _replyto: String(fd.get('email') ?? ''),
+    };
+    if (interest?.value === 'catechism') {
+      payload["Child's name"] = String(fd.get('child_name') ?? '');
+      payload['Child grade'] = String(fd.get('child_grade') ?? '');
+    }
+    if (btn) { btn.disabled = true; btn.textContent = btn.dataset.sending ?? ''; }
+    if (errorBox) errorBox.hidden = true;
+    try {
+      const res = await fetch(form.dataset.endpoint!, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data: unknown = await res.json().catch(() => ({}));
+      const okFlag = typeof data === 'object' && data !== null && 'success' in data ? String((data as { success: unknown }).success) : '';
+      if (!res.ok || okFlag === 'false') throw new Error('send failed');
+      form.hidden = true;
+      if (success) { success.hidden = false; success.focus(); }
+      form.reset();
+      syncChild();
+    } catch {
+      if (errorBox) errorBox.hidden = false;
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = btn.dataset.label ?? ''; }
+    }
+  });
+
+  document.querySelector('[data-again]')?.addEventListener('click', () => {
+    if (form && success) { success.hidden = true; form.hidden = false; }
+  });
+</script>
+
+<style>
+  .contact-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.9fr); gap: clamp(20px, 3vw, 36px); align-items: start; }
+  .form-card { padding: clamp(24px, 4vw, 44px); }
+  .form-card h2 { font-size: clamp(1.8rem, 3vw, 2.4rem); margin-bottom: 4px; }
+  .form-sub { color: var(--muted); font-size: 0.95rem; margin-bottom: 24px; }
+  .row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: block; margin-bottom: 18px; }
+  .field > span { display: block; font-weight: 600; font-size: 0.98rem; margin-bottom: 6px; color: var(--ink); }
+  input:not([type='radio']), select, textarea {
+    width: 100%; font: inherit; font-size: 1.05rem; color: var(--ink);
+    padding: 13px 16px; border-radius: 12px; border: 1.5px solid #dccdb2; background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%237a1f2b' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-inline-end: 42px; }
+  :global([dir='rtl']) select { background-position: left 16px center; }
+  textarea { resize: vertical; min-height: 130px; }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 4px rgba(212, 173, 95, 0.25); }
+  .err { display: none; color: #b3261e; font-size: 0.88rem; font-style: normal; margin-top: 6px; }
+  .field.invalid input { border-color: #b3261e; }
+  .field.invalid .err { display: block; }
+  fieldset { border: 0; padding: 0; margin: 0 0 20px; }
+  legend { font-weight: 600; margin-bottom: 8px; padding: 0; }
+  .child { padding: 18px; border-radius: 14px; background: var(--cream); border: 1px solid var(--line-gold); }
+  .child legend { display: flex; align-items: center; gap: 8px; float: left; width: 100%; margin-bottom: 12px; color: var(--burgundy); }
+  :global([dir='rtl']) .child legend { float: right; }
+  .child .field { margin-bottom: 10px; }
+  .hint { display: flex; gap: 8px; align-items: flex-start; margin: 0; font-size: 0.9rem; color: var(--muted); clear: both; }
+  .hint :global(svg) { margin-top: 4px; flex: none; color: var(--gold); }
+  .pref { display: flex; flex-wrap: wrap; gap: 8px 12px; }
+  .pref legend { width: 100%; }
+  .pref label { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border-radius: 999px; border: 1.5px solid #dccdb2; background: #fff; cursor: pointer; font-size: 0.98rem; }
+  .pref label:has(input:checked) { border-color: var(--burgundy); background: #fbf2f0; color: var(--burgundy); font-weight: 600; }
+  .pref input { accent-color: var(--burgundy); margin: 0; }
+  input.honey { position: absolute; inset-inline-start: 0; width: 1px !important; padding: 0 !important; border: 0 !important; height: 1px; overflow: hidden; clip: rect(0 0 0 0); opacity: 0; pointer-events: none; }
+  .submit { width: 100%; min-height: 56px; font-size: 1.08rem; }
+  .submit:disabled { opacity: 0.7; cursor: wait; }
+  .privacy { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 14px 0 0; font-size: 0.88rem; color: var(--muted); text-align: center; }
+  .form-error { margin: 14px 0 0; padding: 12px 16px; border-radius: 12px; background: #fcebe9; color: #8c1d18; font-size: 0.95rem; }
+  .success { text-align: center; padding: 32px 8px; outline: none; }
+  .success-icon { width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 18px; display: grid; place-items: center; background: var(--thorn); color: #fff; box-shadow: 0 0 0 8px rgba(79, 122, 58, 0.15); }
+  .success p { color: var(--ink-2); }
+
+  .office { position: sticky; top: 104px; display: grid; gap: 16px; }
+  .office-card { border-radius: var(--radius-lg); padding: clamp(24px, 3vw, 36px); box-shadow: var(--shadow); }
+  .office-card h2 { font-size: 1.9rem; }
+  .office-card ul { list-style: none; padding: 0; margin: 0 0 20px; }
+  .office-card li { display: flex; gap: 14px; padding: 12px 0; border-top: 1px solid rgba(234, 215, 168, 0.18); }
+  .office-card li > :global(svg) { color: var(--gold-2); flex: none; margin-top: 4px; }
+  .office-card li span { display: block; font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: #bda882; }
+  :global(html[lang='ar']) .office-card li span { letter-spacing: 0; font-size: 0.92rem; }
+  .office-card li a, .office-card li strong { color: #fff7e8 !important; font-weight: 600; text-decoration: none; word-break: break-word; }
+  .office-card li a:hover { text-decoration: underline; }
+  .social { display: flex; flex-wrap: wrap; gap: 10px; }
+  .urgent { display: flex; gap: 10px; align-items: flex-start; margin: 0; padding: 16px 18px; border-radius: var(--radius); background: #fbf0dd; border: 1px solid var(--line-gold); font-size: 0.95rem; color: var(--ink-2); }
+  .urgent :global(svg) { color: var(--burgundy); flex: none; margin-top: 4px; }
+  .map { height: clamp(320px, 36vw, 460px); padding: 8px; }
+  .map iframe { width: 100%; height: 100%; border: 0; border-radius: 14px; filter: sepia(0.18); }
+  .map-cta { margin-top: 20px; }
+
+  @media (max-width: 960px) {
+    .contact-grid { grid-template-columns: 1fr; }
+    .office { position: static; }
+  }
+  @media (max-width: 560px) { .row.two { grid-template-columns: 1fr; gap: 0; } }
+</style>

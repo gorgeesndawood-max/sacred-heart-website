@@ -1,0 +1,13 @@
+---
+// Budded (trefoil-ended) cross, echoing the cross in the parish logo.
+interface Props { size?: number; class?: string }
+const { size = 22, class: cls } = Astro.props;
+---
+<svg class={cls} width={size} height={size} viewBox="0 0 40 40" fill="currentColor" aria-hidden="true">
+  <rect x="18" y="6" width="4" height="28" rx="1" />
+  <rect x="6" y="15" width="28" height="4" rx="1" />
+  <circle cx="20" cy="3.6" r="2.6" /><circle cx="16.6" cy="6.4" r="2" /><circle cx="23.4" cy="6.4" r="2" />
+  <circle cx="20" cy="36.4" r="2.6" /><circle cx="16.6" cy="33.6" r="2" /><circle cx="23.4" cy="33.6" r="2" />
+  <circle cx="3.6" cy="17" r="2.6" /><circle cx="6.4" cy="13.6" r="2" /><circle cx="6.4" cy="20.4" r="2" />
+  <circle cx="36.4" cy="17" r="2.6" /><circle cx="33.6" cy="13.6" r="2" /><circle cx="33.6" cy="20.4" r="2" />
+</svg>

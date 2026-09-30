@@ -1,0 +1,108 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site, schedule, type Lang } from '../data/site';
+import { t, altPath } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title?: string;
+  description: string;
+  image?: string;
+}
+const { lang, title, description, image = '/images/og-image.jpg' } = Astro.props;
+const fullTitle = title ? `${title} | ${site.name[lang]}` : `${site.name[lang]} · ${lang === 'ar' ? 'وارن، ميشيغان' : 'Warren, MI'}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const alternate = new URL(altPath(Astro.url.pathname, lang), site.url).href;
+const enUrl = lang === 'en' ? canonical : alternate;
+const arUrl = lang === 'ar' ? canonical : alternate;
+
+// Structured data so Google shows the church, address, phone and Mass times.
+const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CatholicChurch',
+  name: site.name.en,
+  alternateName: site.name.ar,
+  url: site.url,
+  logo: `${site.url}/images/logo.png`,
+  image: `${site.url}/images/og-image.jpg`,
+  telephone: site.phone.tel,
+  faxNumber: site.fax,
+  email: site.email,
+  foundingDate: String(site.founded),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.street,
+    addressLocality: site.address.city,
+    addressRegion: site.address.state,
+    postalCode: site.address.zip,
+    addressCountry: 'US',
+  },
+  sameAs: [site.social.instagram, site.social.facebook],
+  event: schedule.filter((s) => s.kind === 'mass').map((s) => ({
+    '@type': 'Event',
+    name: `Holy Mass (${s.lang?.en ?? ''}) — ${dayNames[s.day]} ${s.time}`,
+    eventSchedule: { '@type': 'Schedule', byDay: `https://schema.org/${dayNames[s.day]}`, startTime: s.time, repeatFrequency: 'P1W', scheduleTimezone: 'America/Detroit' },
+    location: { '@type': 'Place', name: site.name.en, address: site.address.oneLine },
+  })),
+};
+---
+<!doctype html>
+<html lang={lang} dir={lang === 'ar' ? 'rtl' : 'ltr'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="en" href={enUrl} />
+    <link rel="alternate" hreflang="ar" href={arUrl} />
+    <link rel="alternate" hreflang="x-default" href={enUrl} />
+    <meta name="theme-color" content="#3a0d13" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name[lang]} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, site.url).href} />
+    <meta property="og:locale" content={lang === 'ar' ? 'ar_IQ' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    {lang === 'en' ? (
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Source+Sans+3:wght@400;600;700&display=swap" />
+    ) : (
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Cinzel:wght@600;700&display=swap" />
+    )}
+    <script is:inline>document.documentElement.classList.add('js');</script>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t(lang, 'skip')}</a>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+
+    <script>
+      // Fade sections in as they scroll into view.
+      const io = new IntersectionObserver(
+        (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }),
+        { rootMargin: '0px 0px -8% 0px', threshold: 0.08 },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+    <style is:global>
+      .skip-link { position: absolute; inset-inline-start: 12px; top: -60px; z-index: 200; background: var(--burgundy); color: #fff; padding: 10px 16px; border-radius: 10px; transition: top 0.2s; }
+      .skip-link:focus { top: 12px; color: #fff; }
+    </style>
+  </body>
+</html>

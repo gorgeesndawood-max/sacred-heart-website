@@ -1,0 +1,121 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import Cross from '../components/Cross.astro';
+import { site, type Lang } from '../data/site';
+import { href, routes } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+
+const c = {
+  en: {
+    title: 'Support the Parish',
+    desc: 'Ways to support Sacred Heart Chaldean Catholic Church in Warren, MI: the Sunday offering, giving by check, and sharing your time and talent.',
+    eyebrow: 'The church is built by its people',
+    lede: 'Thank you for considering a gift to Sacred Heart. Every donation stays at this parish and covers the Church\'s needs.',
+    intro: [
+      'Our goal and priority as a church is to pray and to serve God and His children. We are only able to prosper through the help and generosity of our parishioners. The church is built by its people, for its people.',
+      'If you would like your gift to go toward a specific cause running through the church, simply write it on your envelope or check memo.',
+    ],
+    ways: [
+      ['gift', 'At Mass', 'Place your gift in the offering basket at any weekend Mass. Offering envelopes are available from the parish office.'],
+      ['mail', 'By mail', 'Mail a check payable to "Sacred Heart Chaldean Catholic Church" to the parish address below.'],
+      ['pin', 'At the office', 'Drop off a gift in person, Monday through Friday from 9 AM to 4 PM. We are happy to provide a receipt.'],
+      ['hands', 'Your time & talent', 'Stewardship is more than money. Join a ministry and help the parish with your gifts.'],
+    ],
+    mailTo: 'Make checks payable to',
+    payee: 'Sacred Heart Chaldean Catholic Church',
+    closing: 'We thank God every day for everything that He has given us, and we thank you.',
+    volunteer: 'Find a ministry',
+  },
+  ar: {
+    title: 'ادعم الرعية',
+    desc: 'طرق دعم كنيسة القلب الأقدس الكلدانية الكاثوليكية في وارن: تقدمة الأحد، التبرّع بشيك، ومشاركة وقتك ومواهبك.',
+    eyebrow: 'الكنيسة يبنيها أبناؤها',
+    lede: 'شكراً لتفكيرك في تقديم عطية لكنيسة القلب الأقدس. كل تبرّع يبقى في هذه الرعية ويغطّي احتياجات الكنيسة.',
+    intro: [
+      'هدفنا وأولويتنا ككنيسة أن نصلّي وأن نخدم الله وأبناءه. ولا يمكننا أن نزدهر إلا بمساعدة أبناء رعيتنا وكرمهم. الكنيسة يبنيها أبناؤها، لأبنائها.',
+      'إذا أردت أن تُخصَّص عطيتك لقضية معيّنة تقوم بها الكنيسة، فاكتبها ببساطة على الظرف أو في ملاحظة الشيك.',
+    ],
+    ways: [
+      ['gift', 'في القداس', 'ضع عطيتك في سلّة التقدمة في أي قداس نهاية الأسبوع. ظروف التقدمة متوفرة في مكتب الكنيسة.'],
+      ['mail', 'بالبريد', 'أرسل شيكاً باسم "Sacred Heart Chaldean Catholic Church" إلى عنوان الرعية أدناه.'],
+      ['pin', 'في المكتب', 'سلّم عطيتك شخصياً من الاثنين إلى الجمعة من ٩ صباحاً حتى ٤ مساءً. يسعدنا تقديم إيصال لك.'],
+      ['hands', 'وقتك ومواهبك', 'العطاء أكثر من المال. انضمّ إلى إحدى الخدمات وساعد الرعية بمواهبك.'],
+    ],
+    mailTo: 'تُكتب الشيكات باسم',
+    payee: 'Sacred Heart Chaldean Catholic Church',
+    closing: 'نشكر الله كل يوم على كل ما أعطانا، ونشكركم.',
+    volunteer: 'اعثر على خدمة',
+  },
+}[lang];
+---
+<Base lang={lang} title={c.title} description={c.desc}>
+  <PageHero lang={lang} eyebrow={c.eyebrow} title={c.title} lede={c.lede} image="/images/sanctuary-full.webp" />
+
+  <section class="section-tight">
+    <div class="wrap wrap-narrow prose reveal">
+      {c.intro.map((p) => <p>{p}</p>)}
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap grid grid-4">
+      {c.ways.map(([i, h, p]) => (
+        <div class="way card reveal">
+          <span class="way-icon"><Icon name={i as 'gift'} size={26} /></span>
+          <h3>{h}</h3>
+          <p>{p}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section-tight">
+    <div class="wrap">
+      <div class="check card reveal">
+        <div class="check-line">
+          <span class="lbl">{c.mailTo}</span>
+          <strong dir="ltr">{c.payee}</strong>
+        </div>
+        <div class="check-line">
+          <span class="lbl">{lang === 'en' ? 'Mail to' : 'العنوان'}</span>
+          <strong dir="ltr">{site.address.street}, {site.address.city}, {site.address.state} {site.address.zip}</strong>
+        </div>
+        <Cross size={46} class="check-cross" />
+      </div>
+    </div>
+  </section>
+
+  <section class="section center">
+    <div class="wrap wrap-narrow reveal">
+      <div class="divider"><Cross /></div>
+      <p class="closing">{c.closing}</p>
+      <div class="btn-row">
+        <a class="btn" href={href(routes.ministries, lang)}>{c.volunteer}</a>
+        <a class="btn btn-ghost" href={`tel:${site.phone.tel}`}><Icon name="phone" /> <span dir="ltr">{site.phone.display}</span></a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .way { padding: 28px 24px; }
+  .way-icon { width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--burgundy); color: var(--gold-soft); margin-bottom: 16px; }
+  .way p { color: var(--ink-2); font-size: 1rem; margin: 0; }
+  .check {
+    position: relative; padding: clamp(24px, 4vw, 44px); display: grid; gap: 20px;
+    background: repeating-linear-gradient(0deg, transparent 0 34px, rgba(176, 132, 47, 0.08) 34px 35px), linear-gradient(135deg, #fffaf0, #f6ead2);
+    border: 1px solid var(--line-gold);
+  }
+  .check-line { display: grid; gap: 4px; padding-bottom: 12px; border-bottom: 1.5px solid var(--gold); max-width: 640px; }
+  .lbl { font-family: var(--caps); font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
+  :global(html[lang='ar']) .lbl { font-size: 0.95rem; letter-spacing: 0; }
+  .check-line strong { font-family: var(--serif); font-size: clamp(1.3rem, 2.4vw, 1.8rem); color: var(--burgundy-deep); font-style: italic; }
+  .check :global(.check-cross) { position: absolute; inset-inline-end: clamp(20px, 4vw, 44px); top: 50%; translate: 0 -50%; color: var(--gold-2); opacity: 0.55; }
+  .closing { font-family: var(--serif); font-size: clamp(1.5rem, 3vw, 2.1rem); font-style: italic; color: var(--burgundy-deep); line-height: 1.35; margin-bottom: 1.6rem; }
+  :global(html[lang='ar']) .closing { font-style: normal; }
+  @media (max-width: 640px) { .check :global(.check-cross) { display: none; } }
+</style>
