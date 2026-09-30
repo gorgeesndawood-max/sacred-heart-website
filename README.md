@@ -44,4 +44,4 @@ Posts to [FormSubmit](https://formsubmit.co) → emails **sacredheartchurch2022@
 
 ## Photos
 
-`public/images/` — the parish's own photos (from the old site + Instagram), converted to WebP. `public/images/orig/` holds originals (git-ignored).
+`public/images/` — the parish's own photos (from the old site + Instagram), converted to WebP. Full-size originals are kept in `../research/wix-images-orig/`.
