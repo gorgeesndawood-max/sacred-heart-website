@@ -29,7 +29,7 @@ export const site = {
   eventsPhone: { name: { en: 'Hani', ar: 'هاني' }, display: '(586) 438-6079', tel: '+15864386079' },
   email: 'shccc21@gmail.com',
   // Where the website's contact / sign-up form delivers.
-  formInbox: 'sacredheartchurch2022@gmail.com',
+  formInbox: 'shccc21@gmail.com',
   officeHours: { en: 'Monday – Friday, 9 AM – 4 PM', ar: 'الاثنين – الجمعة، ٩ صباحاً – ٤ مساءً' },
   social: {
     instagram: 'https://www.instagram.com/sacredheartchaldeanchurch/',

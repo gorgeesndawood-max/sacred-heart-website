@@ -33,7 +33,7 @@ Every text field has an `en` and `ar` version. **Arabic was drafted and should b
 
 ## Contact / sign-up form
 
-Posts to [FormSubmit](https://formsubmit.co) → emails **sacredheartchurch2022@gmail.com** (set in `site.ts` → `formInbox`).
+Posts to [FormSubmit](https://formsubmit.co) → emails **shccc21@gmail.com** (set in `site.ts` → `formInbox`).
 **One-time step:** the very first submission sends an "Activate form" email to that inbox. Click it once; after that, every submission arrives as a formatted email with the ministry chosen (and child name + grade for Catechism).
 
 ## Deploy (Vercel)
