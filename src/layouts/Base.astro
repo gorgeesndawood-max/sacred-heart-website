@@ -13,8 +13,12 @@ interface Props {
 }
 const { lang, title, description, image = '/images/og-image.jpg' } = Astro.props;
 const fullTitle = title ? `${title} | ${site.name[lang]}` : `${site.name[lang]} · ${lang === 'ar' ? 'وارن، ميشيغان' : 'Warren, MI'}`;
-const canonical = new URL(Astro.url.pathname, site.url).href;
-const alternate = new URL(altPath(Astro.url.pathname, lang), site.url).href;
+// Live origin: the real domain once connected, otherwise the Vercel URL (see astro.config.mjs).
+const origin = (Astro.site?.href ?? site.url).replace(/\/$/, '');
+const canonical = new URL(Astro.url.pathname, origin).href;
+const alternate = new URL(altPath(Astro.url.pathname, lang), origin).href;
+// Short title for link previews (iMessage, WhatsApp, Facebook).
+const ogTitle = title ? `${title} · ${site.shortName[lang]}` : site.name[lang];
 const enUrl = lang === 'en' ? canonical : alternate;
 const arUrl = lang === 'ar' ? canonical : alternate;
 
@@ -25,9 +29,9 @@ const jsonLd = {
   '@type': 'CatholicChurch',
   name: site.name.en,
   alternateName: site.name.ar,
-  url: site.url,
-  logo: `${site.url}/images/logo.png`,
-  image: `${site.url}/images/og-image.jpg`,
+  url: origin,
+  logo: `${origin}/images/logo.png`,
+  image: `${origin}/images/og-image.jpg`,
   telephone: site.phone.tel,
   faxNumber: site.fax,
   email: site.email,
@@ -67,10 +71,13 @@ const jsonLd = {
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name[lang]} />
-    <meta property="og:title" content={fullTitle} />
+    <meta property="og:title" content={ogTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL(image, site.url).href} />
+    <meta property="og:image" content={new URL(image, origin).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={site.name[lang]} />
     <meta property="og:locale" content={lang === 'ar' ? 'ar_IQ' : 'en_US'} />
     <meta name="twitter:card" content="summary_large_image" />
 

@@ -17,7 +17,7 @@ const related = [
 ].slice(0, 3);
 const signup = href(routes.contact, lang) + `?interest=${m.slug}#signup`;
 ---
-<Base lang={lang} title={m.name[lang]} description={`${m.tagline[lang]} ${m.body[0][lang]}`.slice(0, 158)} image={m.image}>
+<Base lang={lang} title={m.name[lang]} description={`${m.tagline[lang]} ${m.body[0][lang]}`.slice(0, 158)}>
   <PageHero
     lang={lang}
     eyebrow={categories[m.category][lang]}

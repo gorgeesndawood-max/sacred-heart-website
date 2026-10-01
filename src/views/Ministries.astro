@@ -51,7 +51,7 @@ const c = {
   },
 }[lang];
 ---
-<Base lang={lang} title={c.title} description={c.desc} image="/images/bells-choir-2.webp">
+<Base lang={lang} title={c.title} description={c.desc}>
   <PageHero lang={lang} eyebrow={c.eyebrow} title={c.h1} lede={c.lede} image="/images/bells-choir-2.webp">
     <nav class="cat-jump" aria-label={c.title}>
       {order.map((k) => <a href={`#${k}`}>{categories[k][lang]}</a>)}
